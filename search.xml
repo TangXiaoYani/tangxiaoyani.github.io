@@ -3,7 +3,7 @@
   <entry>
     <title>本地hexo博客部署到服务器</title>
     <url>/2020/07/11/%E6%9C%AC%E5%9C%B0hexo%E9%83%A8%E7%BD%B2%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8/</url>
-    <content><![CDATA[<p>本篇内容用来讲述如何将 hexo 博客部署到阿里云的服务器上。<a id="more"></a><br>只要通过三步即可成功部署：</p>
+    <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/5fddc6d846ac820bd374c9e08366ef94.jpg" alt="">本篇内容用来讲述如何将 hexo 博客部署到阿里云的服务器上。<a id="more"></a><br>只要通过三步即可成功部署：</p>
 <ul>
 <li>云服务器端 git 的配置</li>
 <li>Nginx 的配置</li>
@@ -47,8 +47,81 @@
 <p>3.查看git版本</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git --version</span><br></pre></td></tr></table></figure>
 
-<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711162252.png" style="zoom: 50%;" />
+<p><img src="C:%5CUsers%5CTangXiaoYan%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20200711163149062.png" alt="image-20200711163149062"></p>
+<p>如果此时能查看到 git 的版本号，说明我们已经安装成功了</p>
+<p>创建 git 仓库，用于存放博客网站资源<br>1.在 <strong>home/git</strong> 的目录下，创建一个名为<strong>hexoBlog</strong>的裸仓库（bare repo）。<br>如果没有 <strong>home/git</strong> 目录，需要先创建；然后修改目录的所有权和用户权限。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mkdir /home/git/</span><br><span class="line"></span><br><span class="line">chown -R <span class="variable">$USER</span>:<span class="variable">$USER</span> /home/git/</span><br><span class="line"></span><br><span class="line">chmod -R 755 /home/git/</span><br></pre></td></tr></table></figure>
 
+<p>2.然后，执行如下命令.这一步主要创建一个裸的 git 仓库</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/git/</span><br><span class="line"></span><br><span class="line">git init --bare hexoBlog.git</span><br></pre></td></tr></table></figure>
+
+<p><strong>创建一个新的 git 钩子，用于自动部署</strong></p>
+<p>1.在 <strong>/home/git/hexoBlog.git</strong> 下，有一个自动生成的 <strong>hooks</strong> 文件夹。我们需要在里边新建一个新的钩子文件 <strong>post-receive</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /home/git/hexoBlog.git/hooks/post-receive</span><br></pre></td></tr></table></figure>
+
+<p>2.按 <strong>i</strong> 键进入文件的编辑模式，在该文件中添加两行代码（将下边的代码粘贴进去)，指定 Git 的工作树（源代码）和 Git 目录（配置文件等）。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git --work-tree=/home/hexoBlog --git-dir=/home/git/hexoBlog.git checkout -f</span><br></pre></td></tr></table></figure>
+
+<p>3.然后，按 <strong>Esc</strong> 键退出编辑模式，输入<strong>:wq</strong> 保存退出。</p>
+<p>4.修改文件权限，使得其可执行。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">chmod +x /home/git/hexoBlog.git/hooks/post-receive</span><br></pre></td></tr></table></figure>
+
+<p>到这里，我们的 git 仓库算是完全搭建好了。下面进行 Nginx 的配置。</p>
+<h2 id="云服务器端配置-Nginx"><a href="#云服务器端配置-Nginx" class="headerlink" title="云服务器端配置 Nginx"></a>云服务器端配置 Nginx</h2><p>1.安装 <strong>Nginx</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y nginx</span><br></pre></td></tr></table></figure>
+
+<p>2.启动 <strong>Nginx</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">service nginx start</span><br></pre></td></tr></table></figure>
+
+<p>3.测试网页是否能打开.在浏览器中输入服务器 ip 地址，就是服务器的公网 ip。</p>
+<p>4.配置 Nginx 托管文件目录</p>
+<ul>
+<li>创建 /home/hexoBlog目录，用于 Nginx 托管。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mkdir /home/hexoBlog/</span><br><span class="line">   </span><br><span class="line">   chown -R <span class="variable">$USER</span>:<span class="variable">$USER</span> /home/hexoBlog/</span><br><span class="line">   </span><br><span class="line">   chmod -R 755 /home/hexoBlog/</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看 Nginx 的默认配置的安装位置</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nginx -t</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>修改Nginx的默认配置</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">vim /etc/nginx/nginx.conf</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>按方向键，找到如下位置</p>
+<pre><code>server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /home/hexoBlog;    #需要修改
+
+    server_name www.bujige.net; #需要修改
+
+    # Load configuration files for the default server block.
+    include /etc/nginx/default.d/*.conf;
+    location / {
+    }
+    error_page 404 /404.html;
+        location = /40x.html {
+    }</code></pre><p>  }<br><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711164315.png" alt=""></p>
+</li>
+</ul>
+<p>按i键进入插入模式，将其中的 root 值改为<strong>/home/hexoBlog</strong>（刚才创建的托管仓库目录）。<br>将<strong>server_name</strong>值改成你的域名</p>
+<p>5.重启 Nginx 服务</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">systemctl restart nginx</span><br></pre></td></tr></table></figure>
+
+<p>至此，服务器端配置就结束了。接下来，就剩下本地 hexo 的配置更改了。</p>
+<h2 id="修改-hexo-站点配置文件-git-相关设置"><a href="#修改-hexo-站点配置文件-git-相关设置" class="headerlink" title="修改 hexo 站点配置文件 git 相关设置"></a>修改 hexo 站点配置文件 git 相关设置</h2><p>1.打开你本地的 hexo 博客所在文件，打开站点配置文件（不是主题配置文件），做以下修改</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">deploy:</span><br><span class="line">    <span class="built_in">type</span>: git</span><br><span class="line">    repo: root@你的云服务器的IP地址:/home/git/hexoBlog</span><br><span class="line">    branch: master</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711164659.png" alt=""></p>
+<p>2.打开cmd，在 hexo 目录下执行部署。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</span><br></pre></td></tr></table></figure>
+
+<p>3.在地址栏输入打开你的公网 IP，看是不是已经部署成功了</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711165007.png" alt=""></p>
 ]]></content>
   </entry>
   <entry>
