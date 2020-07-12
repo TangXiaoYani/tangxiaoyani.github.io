@@ -1,6 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Active Directory 活动目录搭建</title>
+    <url>/2020/07/12/%E6%B4%BB%E5%8A%A8%E7%9B%AE%E5%BD%95%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<h1 id="域的简单介绍"><a href="#域的简单介绍" class="headerlink" title="域的简单介绍"></a>域的简单介绍</h1><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/01.jpg" alt=""></p>
+<p>为什么要使用域？假设你是公司的系统管理员，你们公司有一千台电脑。如果你要为每台电脑设置登录帐户，设置权限(比如是否允许登录帐户安装软件)，那你要分别坐在这一千台电脑前工作。如果你要做一些改变，你也要分别在这一千台电脑上修改。相信没有哪个管理员想要用这种不吃不喝不睡觉的方式来工作，所以就应运而生了域的概念。<a id="more"></a><br>下面列出了域的几个主要概念：</p>
+<p><strong>AD的全称是Active Directory</strong>：活动目录<br><strong>域（Domain）</strong>:<br>1)域是Windows网络中独立运行的单位，域之间相互访问则需要建立信任关系(即Trust Relation)。信任关系是连接在域与域之间的桥梁。当一个域与其他域建立了信任关系后<br>2)两个域之间不但可以按需要相互进行管理，还可以跨网分配文件和打印机等设备资源，使不同的域之间实现网络资源的共享与管理，以及相互通信和数据传输<br><strong>域控制器（DC）</strong>：<br>域控制器就是一台服务器，负责每一台联入网络的电脑和用户的验证工作。<br><strong>组织单元（OU）</strong><br><strong>用户名服务器名（CN）</strong></p>
+<h1 id="域服务器的搭建，创建域用户，计算机加入域"><a href="#域服务器的搭建，创建域用户，计算机加入域" class="headerlink" title="域服务器的搭建，创建域用户，计算机加入域"></a>域服务器的搭建，创建域用户，计算机加入域</h1><p>这里我使用windows server 2012 r2 搭建域服务器。</p>
+<p><strong>第一步：配置自己的网络。</strong></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712142622.png" style="zoom:50%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712141412.png" style="zoom:50%;" /></p>
+<p><strong>第二步：添加角色功能=&gt;安装’Active Directory域服务’，接着一路下一步，安装完即可。</strong><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135304.png" style="zoom: 80%;" /></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /></p>
+<p>域服务安装完成，下面需要把这台计算机提升为域控，进行如下配置。<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135920.png" style="zoom:80%;" /></p>
+<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712140120.png" style="zoom:80%;" />
+
+<p>然后一直下一步，直到安装成功电脑重启。</p>
+<p><strong>第三步：添加第二台计算器到此域。</strong></p>
+<p>首先还是更改S2的网络配置。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143249.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143227.png" style="zoom: 80%;" /></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143518.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143609.png" style="zoom: 60%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143803.png" style="zoom: 70%;" /></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144617.png" alt="">)<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144646.png" alt=""></p>
+<p>加入域成功，加入后进行重启，登录时用户名后加入@你的域名</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712145002.png" alt=""></p>
+<p>完~</p>
+]]></content>
+      <categories>
+        <category>Windows</category>
+      </categories>
+      <tags>
+        <tag>Active Directory</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>我的世界Linux开服环境搭建</title>
+    <url>/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711132031.png" alt=""></p>
+<p>现在个人服务器价格以及基本进入大众可消费的水平，不是只有需要架设网站的用户才有服务器需求。我们也也可以来做很多事情，比如说搭建一个Minecraft的服务器，让我们可以很方便的与小伙伴联机，这篇主要就来通过Linux以及MCSM面板教大家搭建一个Minecraft服务器。</p>
+<p><font color=#FF0000 >喜欢或者有问题的同学，可以在下发评论留言哦！</font><a id="more"></a></p>
+<h3 id="MCSM面板搭建意义"><a href="#MCSM面板搭建意义" class="headerlink" title="MCSM面板搭建意义"></a>MCSM面板搭建意义</h3><p>1.方便管理服务器，关闭我的世界服务器以及上传和卸载插件都不用登录服务器执行命令，对新手服主非常友好。</p>
+<p>2.可以实时监控服务器状态，如剩余内存，CPU占用率等…</p>
+<h3 id="前期的准备工作"><a href="#前期的准备工作" class="headerlink" title="前期的准备工作"></a>前期的准备工作</h3><p>1.需要一台服务器，以及安装好Linux系统。    (本教程使用阿里云的学生机，系统使用CentOS7.4)</p>
+<p>2.远程SSH的控制软件。    （本教程使用 Xshell）</p>
+<p>3.我的世界服务器核心。    （本教程使用 KCauldron 1.7.10-1614）</p>
+<p>4.FTP软件,用于上传Minecratf服务器核心到服务器。    (本教程使用Xftp)</p>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>1.推荐使用CentOS系统或者RedHat系统，其他Linux系统理论也能实现，但是命令可能有细微变化，所以本教程不推荐使用。</p>
+<p>2.如果部署失败请耐心重新再次开始，大家都是这样过来的。</p>
+<p>3.本教程不适用小白，如果不会使用SSH工具、安装服务器系统，建议老老实实去淘宝买别人搭建好的。</p>
+<h3 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h3><h4 id="系统更新"><a href="#系统更新" class="headerlink" title="系统更新"></a>系统更新</h4><p>确保你的Linux系统是最新的</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum update</span><br></pre></td></tr></table></figure>
+
+<h4 id="安装node-js"><a href="#安装node-js" class="headerlink" title="安装node.js"></a>安装node.js</h4><p>1.安装<code>github</code></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install git -y</span><br></pre></td></tr></table></figure>
+
+<p>2.安装<code>node.js</code>管理器等组件</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://github.com/creationix/nvm.git ~/nvm</span><br><span class="line"><span class="comment"># 设置nvm 自动运行</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"source ~/nvm/nvm.sh"</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br><span class="line"><span class="comment"># 查询node.js的版本</span></span><br><span class="line">nvm list-remote</span><br><span class="line"><span class="comment"># 安装node.js，目前最新版本为v14.4.0</span></span><br><span class="line">nvm install v14.4.0</span><br></pre></td></tr></table></figure>
+
+<p>3.安装结束之后，请重启服务器（重要！）</p>
+<h4 id="安装Java8"><a href="#安装Java8" class="headerlink" title="安装Java8"></a>安装Java8</h4><p>使用<code>yum</code>安装<code>java8</code>安装</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装java8</span></span><br><span class="line">yum install -y java</span><br><span class="line"><span class="comment">#查看java版本</span></span><br><span class="line">java -version</span><br></pre></td></tr></table></figure>
+
+<p>没有报错，成功回显版本号则安装Java成功</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711163245.png" alt=""></p>
+<h4 id="安装MCSM"><a href="#安装MCSM" class="headerlink" title="安装MCSM"></a>安装MCSM</h4><p>克隆<strong>MCSManager</strong>并安装依赖</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 克隆目录</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/suwings/mcsmanager.git</span><br><span class="line"><span class="comment"># cd至目录</span></span><br><span class="line"><span class="built_in">cd</span> mcsmanager/</span><br><span class="line"><span class="comment"># 安装依赖库</span></span><br><span class="line">npm install</span><br><span class="line"><span class="comment"># 启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
+
+<p>启动成功效果图</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134158.png" alt=""></p>
+<h4 id="保持后台运行"><a href="#保持后台运行" class="headerlink" title="保持后台运行"></a>保持后台运行</h4><p>先<code>Ctrl+C</code>关闭面板，我们使用<code>screen</code>软件来让面板保持后台运行。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装screen</span></span><br><span class="line">yum install screen -y</span><br><span class="line"><span class="comment"># 创建一个名为 mcsm 的窗口</span></span><br><span class="line">screen -S mcsm</span><br><span class="line"><span class="comment"># 在此新终端窗口内启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
+
+<p>开启后可以直接与终端断开连接，面板讲保持后台运行。</p>
+<p><strong>若要重新控制，请输入命令即可：</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">screen -r mcsm</span><br></pre></td></tr></table></figure>
+
+<h3 id="端口开放"><a href="#端口开放" class="headerlink" title="端口开放"></a>端口开放</h3><p>面板需要 23333（主功能） 端口与 20010 - 20200（FTP功能）端口区间。</p>
+<p>Minecraft需要开放25565（我的世界默认）端口号。</p>
+<p>如果你使用阿里云，腾讯云或者服务商，<strong>请进入控制台到防火墙安全组策略，放行以上端口。</strong></p>
+<h3 id="登录MCSM账户"><a href="#登录MCSM账户" class="headerlink" title="登录MCSM账户"></a>登录MCSM账户</h3><p>现在，访问 http://你的公网IP:23333/ 即可进入面板。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 开头带“#”为最高管理员权限（注意，管理员与管理员之间账号可互删）不带“#”为用户账户</span><br><span class="line">默认账号：#master</span><br><span class="line">默认密码: 123456</span><br></pre></td></tr></table></figure>
+
+<p>请及时修改密码。管理员可以互删。</p>
+<h3 id="FTP服务"><a href="#FTP服务" class="headerlink" title="FTP服务"></a>FTP服务</h3><p>需要使用FTP协议上传服务器核心到服务器上。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134440.png" alt=""></p>
+<h3 id="MCSM面板使用"><a href="#MCSM面板使用" class="headerlink" title="MCSM面板使用"></a>MCSM面板使用</h3><p>1.创建实例，这里使用快速创建</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135100.png" alt=""></p>
+<p>2.根据提示设置好参数。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135012.png" alt="[]()"></p>
+<h3 id="开启Minecraft服务器"><a href="#开启Minecraft服务器" class="headerlink" title="开启Minecraft服务器"></a>开启Minecraft服务器</h3><h4 id="EULA最终用户协议"><a href="#EULA最终用户协议" class="headerlink" title="EULA最终用户协议"></a>EULA最终用户协议</h4><p>第一次开服一定失败，返回你的<code>服务器根目录</code>,你会发现多了一个叫做eula.txt的文件，编辑它把 eula=false 改成 eula=true 就行了，这是EULA最终用户许克协议。</p>
+<p><strong>但是</strong>我希望所有服主可以看一看<code>EULA</code></p>
+<p>Minecraft EULA：<a href="https://account.mojang.com/documents/minecraft_eula" target="_blank" rel="noopener">官方汉化链接</a></p>
+<p><strong>以下两条比较重要 我更换了代词方便大家理解</strong></p>
+<ul>
+<li><p>不得将Mojang创建的任何内容用于商业用途；</p>
+</li>
+<li><p>不得试图通过Mojang创建的任何内容赚钱；</p>
+</li>
+</ul>
+<p>这意味着你几乎和开公益服没有区别，但是我们关起门来说话，违反<code>eula</code>的服务器与服主 全世界比比皆是</p>
+<p>这<strong>不代表</strong>你可以认为 你可以光明正大地开商业化服务器</p>
+<p>但在这种大环境下 我相信可怜的绝大部分人 做不到 不违反<code>eula</code></p>
+<p>所以 请你们抱着<strong>内疚，悔恨</strong>的心理 看待你开了违反<code>eula</code>的服务器这一事实</p>
+<p>刚刚气氛好沉重啊 让我们回归主题，继续把服务器开起来吧！</p>
+<h4 id="关闭正版验证"><a href="#关闭正版验证" class="headerlink" title="关闭正版验证"></a>关闭正版验证</h4><p>返回你的<code>服务器根目录</code>找到server.properties这个文件，编辑它，更改 online-mode=true 为online-mode=false</p>
+<p><strong>不关这个正版验证 如果你不是正版玩家你是进不去服务器的</strong></p>
+<p>当然，Mojang已经说过了，如果你现在买不起Minecraft，可以先玩，以后有能力了再来补票。</p>
+<p><strong>注意：</strong>正版玩家和盗版玩家是没有区别的！但我还是希望每个热爱这款游戏，有能力的玩家都可以去支持一下正版。</p>
+<p><strong>做了以上两步操作就可以通过面板开启服务器了</strong></p>
+<h3 id="进入Minecraft服务器"><a href="#进入Minecraft服务器" class="headerlink" title="进入Minecraft服务器"></a>进入Minecraft服务器</h3><p>插一嘴，我建议使用<code>HMCL</code>启动器</p>
+<p>官网链接：<a href="https://hmcl.huangyuhui.net/download" target="_blank" rel="noopener">HMCL启动器</a></p>
+<p>进入游戏之后选择多人游戏，然后添加服务器，服务器地址可以写ip或者域名。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140416.png" alt=""></p>
+<p>添加之后可以看到服务器已经开启，我们双击进入。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140441.png" alt=""></p>
+<p>好的，我们的服务器就这样开起来了，是不是觉得很简单呢。</p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Minecraft</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>本地hexo博客部署到服务器</title>
     <url>/2020/07/11/%E6%9C%AC%E5%9C%B0hexo%E9%83%A8%E7%BD%B2%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8/</url>
     <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/5fddc6d846ac820bd374c9e08366ef94.jpg" alt="">本篇内容用来讲述如何将 hexo 博客部署到阿里云的服务器上。<a id="more"></a><br>只要通过三步即可成功部署：</p>
@@ -128,127 +250,6 @@
       </categories>
       <tags>
         <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Active Directory 活动目录搭建</title>
-    <url>/2020/07/12/%E6%B4%BB%E5%8A%A8%E7%9B%AE%E5%BD%95%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<h1 id="域的简单介绍"><a href="#域的简单介绍" class="headerlink" title="域的简单介绍"></a>域的简单介绍</h1><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/01.jpg" alt="">)为什么要使用域？假设你是公司的系统管理员，你们公司有一千台电脑。如果你要为每台电脑设置登录帐户，设置权限(比如是否允许登录帐户安装软件)，那你要分别坐在这一千台电脑前工作。如果你要做一些改变，你也要分别在这一千台电脑上修改。相信没有哪个管理员想要用这种不吃不喝不睡觉的方式来工作，所以就应运而生了域的概念。<a id="more"></a><br>下面列出了域的几个主要概念：</p>
-<p><strong>AD的全称是Active Directory</strong>：活动目录<br><strong>域（Domain）</strong>:<br>1)域是Windows网络中独立运行的单位，域之间相互访问则需要建立信任关系(即Trust Relation)。信任关系是连接在域与域之间的桥梁。当一个域与其他域建立了信任关系后<br>2)两个域之间不但可以按需要相互进行管理，还可以跨网分配文件和打印机等设备资源，使不同的域之间实现网络资源的共享与管理，以及相互通信和数据传输<br><strong>域控制器（DC）</strong>：<br>域控制器就是一台服务器，负责每一台联入网络的电脑和用户的验证工作。<br><strong>组织单元（OU）</strong><br><strong>用户名服务器名（CN）</strong></p>
-<h1 id="域服务器的搭建，创建域用户，计算机加入域"><a href="#域服务器的搭建，创建域用户，计算机加入域" class="headerlink" title="域服务器的搭建，创建域用户，计算机加入域"></a>域服务器的搭建，创建域用户，计算机加入域</h1><p>这里我使用windows server 2012 r2 搭建域服务器。</p>
-<p><strong>第一步：配置自己的网络。</strong></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712142622.png" style="zoom:50%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712141412.png" style="zoom:50%;" /></p>
-<p><strong>第二步：添加角色功能=&gt;安装’Active Directory域服务’，接着一路下一步，安装完即可。</strong><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135304.png" style="zoom: 80%;" /></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /></p>
-<p>域服务安装完成，下面需要把这台计算机提升为域控，进行如下配置。<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135920.png" style="zoom:80%;" /></p>
-<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712140120.png" style="zoom:80%;" />
-
-<p>然后一直下一步，直到安装成功电脑重启。</p>
-<p><strong>第三步：添加第二台计算器到此域。</strong></p>
-<p>首先还是更改S2的网络配置。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143249.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143227.png" style="zoom: 80%;" /></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143518.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143609.png" style="zoom: 60%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143803.png" style="zoom: 70%;" /></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144617.png" alt="">)<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144646.png" alt=""></p>
-<p>加入域成功，加入后进行重启，登录时用户名后加入@你的域名</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712145002.png" alt=""></p>
-<p>完~</p>
-]]></content>
-      <categories>
-        <category>Windows</category>
-      </categories>
-      <tags>
-        <tag>Active Directory</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>我的世界Linux开服环境搭建</title>
-    <url>/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711132031.png" alt=""></p>
-<p>现在个人服务器价格以及基本进入大众可消费的水平，不是只有需要架设网站的用户才有服务器需求。我们也也可以来做很多事情，比如说搭建一个Minecraft的服务器，让我们可以很方便的与小伙伴联机，这篇主要就来通过Linux以及MCSM面板教大家搭建一个Minecraft服务器。</p>
-<p><font color=#FF0000 >喜欢或者有问题的同学，可以在下发评论留言哦！</font><a id="more"></a></p>
-<h3 id="MCSM面板搭建意义"><a href="#MCSM面板搭建意义" class="headerlink" title="MCSM面板搭建意义"></a>MCSM面板搭建意义</h3><p>1.方便管理服务器，关闭我的世界服务器以及上传和卸载插件都不用登录服务器执行命令，对新手服主非常友好。</p>
-<p>2.可以实时监控服务器状态，如剩余内存，CPU占用率等…</p>
-<h3 id="前期的准备工作"><a href="#前期的准备工作" class="headerlink" title="前期的准备工作"></a>前期的准备工作</h3><p>1.需要一台服务器，以及安装好Linux系统。    (本教程使用阿里云的学生机，系统使用CentOS7.4)</p>
-<p>2.远程SSH的控制软件。    （本教程使用 Xshell）</p>
-<p>3.我的世界服务器核心。    （本教程使用 KCauldron 1.7.10-1614）</p>
-<p>4.FTP软件,用于上传Minecratf服务器核心到服务器。    (本教程使用Xftp)</p>
-<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>1.推荐使用CentOS系统或者RedHat系统，其他Linux系统理论也能实现，但是命令可能有细微变化，所以本教程不推荐使用。</p>
-<p>2.如果部署失败请耐心重新再次开始，大家都是这样过来的。</p>
-<p>3.本教程不适用小白，如果不会使用SSH工具、安装服务器系统，建议老老实实去淘宝买别人搭建好的。</p>
-<h3 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h3><h4 id="系统更新"><a href="#系统更新" class="headerlink" title="系统更新"></a>系统更新</h4><p>确保你的Linux系统是最新的</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum update</span><br></pre></td></tr></table></figure>
-
-<h4 id="安装node-js"><a href="#安装node-js" class="headerlink" title="安装node.js"></a>安装node.js</h4><p>1.安装<code>github</code></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install git -y</span><br></pre></td></tr></table></figure>
-
-<p>2.安装<code>node.js</code>管理器等组件</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://github.com/creationix/nvm.git ~/nvm</span><br><span class="line"><span class="comment"># 设置nvm 自动运行</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"source ~/nvm/nvm.sh"</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br><span class="line"><span class="comment"># 查询node.js的版本</span></span><br><span class="line">nvm list-remote</span><br><span class="line"><span class="comment"># 安装node.js，目前最新版本为v14.4.0</span></span><br><span class="line">nvm install v14.4.0</span><br></pre></td></tr></table></figure>
-
-<p>3.安装结束之后，请重启服务器（重要！）</p>
-<h4 id="安装Java8"><a href="#安装Java8" class="headerlink" title="安装Java8"></a>安装Java8</h4><p>使用<code>yum</code>安装<code>java8</code>安装</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装java8</span></span><br><span class="line">yum install -y java</span><br><span class="line"><span class="comment">#查看java版本</span></span><br><span class="line">java -version</span><br></pre></td></tr></table></figure>
-
-<p>没有报错，成功回显版本号则安装Java成功</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711163245.png" alt=""></p>
-<h4 id="安装MCSM"><a href="#安装MCSM" class="headerlink" title="安装MCSM"></a>安装MCSM</h4><p>克隆<strong>MCSManager</strong>并安装依赖</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 克隆目录</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/suwings/mcsmanager.git</span><br><span class="line"><span class="comment"># cd至目录</span></span><br><span class="line"><span class="built_in">cd</span> mcsmanager/</span><br><span class="line"><span class="comment"># 安装依赖库</span></span><br><span class="line">npm install</span><br><span class="line"><span class="comment"># 启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
-
-<p>启动成功效果图</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134158.png" alt=""></p>
-<h4 id="保持后台运行"><a href="#保持后台运行" class="headerlink" title="保持后台运行"></a>保持后台运行</h4><p>先<code>Ctrl+C</code>关闭面板，我们使用<code>screen</code>软件来让面板保持后台运行。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装screen</span></span><br><span class="line">yum install screen -y</span><br><span class="line"><span class="comment"># 创建一个名为 mcsm 的窗口</span></span><br><span class="line">screen -S mcsm</span><br><span class="line"><span class="comment"># 在此新终端窗口内启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
-
-<p>开启后可以直接与终端断开连接，面板讲保持后台运行。</p>
-<p><strong>若要重新控制，请输入命令即可：</strong></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">screen -r mcsm</span><br></pre></td></tr></table></figure>
-
-<h3 id="端口开放"><a href="#端口开放" class="headerlink" title="端口开放"></a>端口开放</h3><p>面板需要 23333（主功能） 端口与 20010 - 20200（FTP功能）端口区间。</p>
-<p>Minecraft需要开放25565（我的世界默认）端口号。</p>
-<p>如果你使用阿里云，腾讯云或者服务商，<strong>请进入控制台到防火墙安全组策略，放行以上端口。</strong></p>
-<h3 id="登录MCSM账户"><a href="#登录MCSM账户" class="headerlink" title="登录MCSM账户"></a>登录MCSM账户</h3><p>现在，访问 http://你的公网IP:23333/ 即可进入面板。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 开头带“#”为最高管理员权限（注意，管理员与管理员之间账号可互删）不带“#”为用户账户</span><br><span class="line">默认账号：#master</span><br><span class="line">默认密码: 123456</span><br></pre></td></tr></table></figure>
-
-<p>请及时修改密码。管理员可以互删。</p>
-<h3 id="FTP服务"><a href="#FTP服务" class="headerlink" title="FTP服务"></a>FTP服务</h3><p>需要使用FTP协议上传服务器核心到服务器上。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134440.png" alt=""></p>
-<h3 id="MCSM面板使用"><a href="#MCSM面板使用" class="headerlink" title="MCSM面板使用"></a>MCSM面板使用</h3><p>1.创建实例，这里使用快速创建</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135100.png" alt=""></p>
-<p>2.根据提示设置好参数。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135012.png" alt="[]()"></p>
-<h3 id="开启Minecraft服务器"><a href="#开启Minecraft服务器" class="headerlink" title="开启Minecraft服务器"></a>开启Minecraft服务器</h3><h4 id="EULA最终用户协议"><a href="#EULA最终用户协议" class="headerlink" title="EULA最终用户协议"></a>EULA最终用户协议</h4><p>第一次开服一定失败，返回你的<code>服务器根目录</code>,你会发现多了一个叫做eula.txt的文件，编辑它把 eula=false 改成 eula=true 就行了，这是EULA最终用户许克协议。</p>
-<p><strong>但是</strong>我希望所有服主可以看一看<code>EULA</code></p>
-<p>Minecraft EULA：<a href="https://account.mojang.com/documents/minecraft_eula" target="_blank" rel="noopener">官方汉化链接</a></p>
-<p><strong>以下两条比较重要 我更换了代词方便大家理解</strong></p>
-<ul>
-<li><p>不得将Mojang创建的任何内容用于商业用途；</p>
-</li>
-<li><p>不得试图通过Mojang创建的任何内容赚钱；</p>
-</li>
-</ul>
-<p>这意味着你几乎和开公益服没有区别，但是我们关起门来说话，违反<code>eula</code>的服务器与服主 全世界比比皆是</p>
-<p>这<strong>不代表</strong>你可以认为 你可以光明正大地开商业化服务器</p>
-<p>但在这种大环境下 我相信可怜的绝大部分人 做不到 不违反<code>eula</code></p>
-<p>所以 请你们抱着<strong>内疚，悔恨</strong>的心理 看待你开了违反<code>eula</code>的服务器这一事实</p>
-<p>刚刚气氛好沉重啊 让我们回归主题，继续把服务器开起来吧！</p>
-<h4 id="关闭正版验证"><a href="#关闭正版验证" class="headerlink" title="关闭正版验证"></a>关闭正版验证</h4><p>返回你的<code>服务器根目录</code>找到server.properties这个文件，编辑它，更改 online-mode=true 为online-mode=false</p>
-<p><strong>不关这个正版验证 如果你不是正版玩家你是进不去服务器的</strong></p>
-<p>当然，Mojang已经说过了，如果你现在买不起Minecraft，可以先玩，以后有能力了再来补票。</p>
-<p><strong>注意：</strong>正版玩家和盗版玩家是没有区别的！但我还是希望每个热爱这款游戏，有能力的玩家都可以去支持一下正版。</p>
-<p><strong>做了以上两步操作就可以通过面板开启服务器了</strong></p>
-<h3 id="进入Minecraft服务器"><a href="#进入Minecraft服务器" class="headerlink" title="进入Minecraft服务器"></a>进入Minecraft服务器</h3><p>插一嘴，我建议使用<code>HMCL</code>启动器</p>
-<p>官网链接：<a href="https://hmcl.huangyuhui.net/download" target="_blank" rel="noopener">HMCL启动器</a></p>
-<p>进入游戏之后选择多人游戏，然后添加服务器，服务器地址可以写ip或者域名。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140416.png" alt=""></p>
-<p>添加之后可以看到服务器已经开启，我们双击进入。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140441.png" alt=""></p>
-<p>好的，我们的服务器就这样开起来了，是不是觉得很简单呢。</p>
-]]></content>
-      <categories>
-        <category>Linux</category>
-      </categories>
-      <tags>
-        <tag>Minecraft</tag>
       </tags>
   </entry>
 </search>
