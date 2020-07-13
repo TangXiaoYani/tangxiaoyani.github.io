@@ -1,35 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Active Directory 活动目录搭建</title>
-    <url>/2020/07/12/%E6%B4%BB%E5%8A%A8%E7%9B%AE%E5%BD%95%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<h1 id="域的简单介绍"><a href="#域的简单介绍" class="headerlink" title="域的简单介绍"></a>域的简单介绍</h1><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/01.jpg" alt=""></p>
-<p>为什么要使用域？假设你是公司的系统管理员，你们公司有一千台电脑。如果你要为每台电脑设置登录帐户，设置权限(比如是否允许登录帐户安装软件)，那你要分别坐在这一千台电脑前工作。如果你要做一些改变，你也要分别在这一千台电脑上修改。相信没有哪个管理员想要用这种不吃不喝不睡觉的方式来工作，所以就应运而生了域的概念。<a id="more"></a><br>下面列出了域的几个主要概念：</p>
-<p><strong>AD的全称是Active Directory</strong>：活动目录<br><strong>域（Domain）</strong>:<br>1)域是Windows网络中独立运行的单位，域之间相互访问则需要建立信任关系(即Trust Relation)。信任关系是连接在域与域之间的桥梁。当一个域与其他域建立了信任关系后<br>2)两个域之间不但可以按需要相互进行管理，还可以跨网分配文件和打印机等设备资源，使不同的域之间实现网络资源的共享与管理，以及相互通信和数据传输<br><strong>域控制器（DC）</strong>：<br>域控制器就是一台服务器，负责每一台联入网络的电脑和用户的验证工作。<br><strong>组织单元（OU）</strong><br><strong>用户名服务器名（CN）</strong></p>
-<h1 id="域服务器的搭建，创建域用户，计算机加入域"><a href="#域服务器的搭建，创建域用户，计算机加入域" class="headerlink" title="域服务器的搭建，创建域用户，计算机加入域"></a>域服务器的搭建，创建域用户，计算机加入域</h1><p>这里我使用windows server 2012 r2 搭建域服务器。</p>
-<p><strong>第一步：配置自己的网络。</strong></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712142622.png" style="zoom:50%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712141412.png" style="zoom:50%;" /></p>
-<p><strong>第二步：添加角色功能=&gt;安装’Active Directory域服务’，接着一路下一步，安装完即可。</strong><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135304.png" style="zoom: 80%;" /></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /></p>
-<p>域服务安装完成，下面需要把这台计算机提升为域控，进行如下配置。<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135920.png" style="zoom:80%;" /></p>
-<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712140120.png" style="zoom:80%;" />
+    <title>Nginx服务安装SSL证书</title>
+    <url>/2020/07/13/Nginx%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85SSL%E8%AF%81%E4%B9%A6/</url>
+    <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/u=3379754713,1922618047&fm=26&gp=0.jpg" alt=""></p>
+<p>本篇内容用来讲述如何配置Nginx，为服务器安装SSL证书，完成网页通过https的访问。<a id="more"></a></p>
+<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><ul>
+<li><p>准备文件远程传输软件，例如Xftp，WinSCP，FinalShell等（建议从官网下载最新版本）</p>
+</li>
+<li><p>准备远程登录工具，例如FinalShell，Xshell等（建议从官网下载最新版本）</p>
+</li>
+<li><p>配置好服务器，并已在当前服务器中安装配置 Nginx 服务。</p>
+</li>
+</ul>
+<h2 id="申请SSL证书"><a href="#申请SSL证书" class="headerlink" title="申请SSL证书"></a>申请SSL证书</h2><p>去各大平台申请SSL证书如阿里云、华为云、腾讯云，这里我选择华为云。</p>
+<p>在购买ssl产品前，一定要先详细了解各类型ssl产品，根据自己的公司的类型，选择适合的ssl证书类型</p>
+<p>SSL证书一般分为EV型、OV型、DV型三种类型的证书。</p>
+<p>EV型SSL证书适用：金融（银行、基金、证券、保险）、互联网金融（P2P、基金代销、众筹、融资、投资、理财类）及对安全性标准要求较高的行业。</p>
+<p>OV型SSL证书适用：互联网信息、电子商务、制造行业、运营商、政府、教育等行业。</p>
+<p>DV型SSL证书适用：小型客户、个人及测试使用。</p>
+<p>这里我在华为云选择申请免费的DV型证书。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713225832.png" alt=""></p>
+<h2 id="下载SSL证书，并上传至服务器"><a href="#下载SSL证书，并上传至服务器" class="headerlink" title="下载SSL证书，并上传至服务器"></a>下载SSL证书，并上传至服务器</h2><p>申请成功之后我们需要下载证书到本地，因为我们是通过Nginx服务，所以只解压Nginx文件夹内的证书。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713230109.png" alt=""></p>
+<p>解压完成后可以看到两个文件，我们需要把这两个文件上传至自己的服务器。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713230312.png" alt=""></p>
+<p>在Nginx的主目录，创建一个叫做cert的目录，通过Xftp把上面两个文件传输至此文件夹内。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mkdir /etc/nginx/cert</span><br></pre></td></tr></table></figure>
 
-<p>然后一直下一步，直到安装成功电脑重启。</p>
-<p><strong>第三步：添加第二台计算器到此域。</strong></p>
-<p>首先还是更改S2的网络配置。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143249.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143227.png" style="zoom: 80%;" /></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143518.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143609.png" style="zoom: 60%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143803.png" style="zoom: 70%;" /></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144617.png" alt="">)<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144646.png" alt=""></p>
-<p>加入域成功，加入后进行重启，登录时用户名后加入@你的域名</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712145002.png" alt=""></p>
-<p>完~</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713230503.png" alt=""></p>
+<h2 id="修改Nginx的默认配置"><a href="#修改Nginx的默认配置" class="headerlink" title="修改Nginx的默认配置"></a>修改Nginx的默认配置</h2><ul>
+<li>打开Nginx的配置文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /etc/nginx/nginx.conf</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>修改Nginx的配置文件为如下，80端口的http服务不需要做更改，把下面代码加入到80端口前面。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       443 ssl http2 default_server;</span><br><span class="line">    listen       [::]:443 ssl http2 default_server;</span><br><span class="line">    server_name  www.tangxiaoyani.com;</span><br><span class="line">    root         /home/hexoBlog;</span><br><span class="line"></span><br><span class="line">    ssl_certificate <span class="string">"/etc/nginx/cert/server.crt"</span>;</span><br><span class="line">    ssl_certificate_key <span class="string">"/etc/nginx/cert/server.key"</span>;</span><br><span class="line">    ssl_session_cache shared:SSL:1m;</span><br><span class="line">    ssl_session_timeout  10m;</span><br><span class="line">    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;</span><br><span class="line">    ssl_prefer_server_ciphers on;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Load configuration files for the default server block.</span></span><br><span class="line">    include /etc/nginx/default.d/*.conf;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 404 /404.html;</span><br><span class="line">        location = /40x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 500 502 503 504 /50x.html;</span><br><span class="line">        location = /50x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713231602.png" alt=""></p>
+<p>OK，这样https的网页就配置好了，最后我们设置80端口的http服务，这样可以完成如果有人通过http服务访问网页会强制跳转到https页面。</p>
+<h2 id="设置http强制跳转https"><a href="#设置http强制跳转https" class="headerlink" title="设置http强制跳转https"></a>设置http强制跳转https</h2><p>设置非常简单，只需要添加一行代码，但是需要记住，https的代码要写在http的上面。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rewrite ^(.*)$ https://<span class="variable">$host</span><span class="variable">$1</span> permanent;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713232219.png" alt=""></p>
 ]]></content>
       <categories>
-        <category>Windows</category>
+        <category>Linux</category>
       </categories>
       <tags>
-        <tag>Active Directory</tag>
+        <tag>hexo</tag>
       </tags>
   </entry>
   <entry>
@@ -131,7 +154,11 @@
 <li>Nginx 的配置</li>
 <li>本地端 hexo 的设置更改</li>
 </ul>
-<h2 id="进入云服务器中"><a href="#进入云服务器中" class="headerlink" title="进入云服务器中"></a>进入云服务器中</h2><p>可以通过各大云服务器官网进入，或者通过Xshell6软件进入。</p>
+<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><ul>
+<li>准备远程登录工具，例如FinalShell，Xshell等（建议从官网下载最新版本）</li>
+<li>一台服务器</li>
+</ul>
+<h2 id="进入服务器中"><a href="#进入服务器中" class="headerlink" title="进入服务器中"></a>进入服务器中</h2><p>可以通过各大云服务器官网进入，或者通过Xshell6软件进入。</p>
 <p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711161804.png" alt=""></p>
 <h2 id="云服务器端配置-git"><a href="#云服务器端配置-git" class="headerlink" title="云服务器端配置 git"></a>云服务器端配置 git</h2><p><strong>安装依赖库和编译工具</strong></p>
 <p>1.安装依赖库</p>
@@ -214,20 +241,27 @@
 
 <ul>
 <li><p>按方向键，找到如下位置</p>
-<pre><code>server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    root /home/hexoBlog;    #需要修改
+<pre><code>    server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        server_name  www.tangxiaoyani.com;    需要修改
+        root         /home/hexoBlog;    需要修改
 
-    server_name www.bujige.net; #需要修改
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
 
-    # Load configuration files for the default server block.
-    include /etc/nginx/default.d/*.conf;
-    location / {
+        location / {
+        }
+
+        error_page 404 /404.html;
+            location = /40x.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+            location = /50x.html {
+        }
     }
-    error_page 404 /404.html;
-        location = /40x.html {
-    }</code></pre><p>  }<br><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711164315.png" alt=""></p>
+}</code></pre><p>  }<br> <img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713223649.png" alt=""></p>
 </li>
 </ul>
 <p>按i键进入插入模式，将其中的 root 值改为<strong>/home/hexoBlog</strong>（刚才创建的托管仓库目录）。<br>将<strong>server_name</strong>值改成你的域名</p>
@@ -250,6 +284,38 @@
       </categories>
       <tags>
         <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Active Directory 活动目录搭建</title>
+    <url>/2020/07/12/%E6%B4%BB%E5%8A%A8%E7%9B%AE%E5%BD%95%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<h1 id="域的简单介绍"><a href="#域的简单介绍" class="headerlink" title="域的简单介绍"></a>域的简单介绍</h1><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/01.jpg" alt=""></p>
+<p>为什么要使用域？假设你是公司的系统管理员，你们公司有一千台电脑。如果你要为每台电脑设置登录帐户，设置权限(比如是否允许登录帐户安装软件)，那你要分别坐在这一千台电脑前工作。如果你要做一些改变，你也要分别在这一千台电脑上修改。相信没有哪个管理员想要用这种不吃不喝不睡觉的方式来工作，所以就应运而生了域的概念。<a id="more"></a><br>下面列出了域的几个主要概念：</p>
+<p><strong>AD的全称是Active Directory</strong>：活动目录<br><strong>域（Domain）</strong>:<br>1)域是Windows网络中独立运行的单位，域之间相互访问则需要建立信任关系(即Trust Relation)。信任关系是连接在域与域之间的桥梁。当一个域与其他域建立了信任关系后<br>2)两个域之间不但可以按需要相互进行管理，还可以跨网分配文件和打印机等设备资源，使不同的域之间实现网络资源的共享与管理，以及相互通信和数据传输<br><strong>域控制器（DC）</strong>：<br>域控制器就是一台服务器，负责每一台联入网络的电脑和用户的验证工作。<br><strong>组织单元（OU）</strong><br><strong>用户名服务器名（CN）</strong></p>
+<h1 id="域服务器的搭建，创建域用户，计算机加入域"><a href="#域服务器的搭建，创建域用户，计算机加入域" class="headerlink" title="域服务器的搭建，创建域用户，计算机加入域"></a>域服务器的搭建，创建域用户，计算机加入域</h1><p>这里我使用windows server 2012 r2 搭建域服务器。</p>
+<p><strong>第一步：配置自己的网络。</strong></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712142622.png" style="zoom:50%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712141412.png" style="zoom:50%;" /></p>
+<p><strong>第二步：添加角色功能=&gt;安装’Active Directory域服务’，接着一路下一步，安装完即可。</strong><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135304.png" style="zoom: 80%;" /></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /></p>
+<p>域服务安装完成，下面需要把这台计算机提升为域控，进行如下配置。<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135920.png" style="zoom:80%;" /></p>
+<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712140120.png" style="zoom:80%;" />
+
+<p>然后一直下一步，直到安装成功电脑重启。</p>
+<p><strong>第三步：添加第二台计算器到此域。</strong></p>
+<p>首先还是更改S2的网络配置。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143249.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143227.png" style="zoom: 80%;" /></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143518.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143609.png" style="zoom: 60%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143803.png" style="zoom: 70%;" /></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144617.png" alt="">)<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144646.png" alt=""></p>
+<p>加入域成功，加入后进行重启，登录时用户名后加入@你的域名</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712145002.png" alt=""></p>
+<p>完~</p>
+]]></content>
+      <categories>
+        <category>Windows</category>
+      </categories>
+      <tags>
+        <tag>Active Directory</tag>
       </tags>
   </entry>
 </search>
