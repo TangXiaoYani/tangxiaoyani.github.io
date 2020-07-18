@@ -1,67 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Nginx服务安装SSL证书</title>
-    <url>/2020/07/13/Nginx%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85SSL%E8%AF%81%E4%B9%A6/</url>
-    <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/u=3379754713,1922618047&fm=26&gp=0.jpg" alt=""></p>
-<p>本篇内容用来讲述如何配置Nginx，为服务器安装SSL证书，完成网页通过https的访问。<a id="more"></a></p>
-<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><ul>
-<li><p>准备文件远程传输软件，例如Xftp，WinSCP，FinalShell等（建议从官网下载最新版本）</p>
-</li>
-<li><p>准备远程登录工具，例如FinalShell，Xshell等（建议从官网下载最新版本）</p>
-</li>
-<li><p>配置好服务器，并已在当前服务器中安装配置 Nginx 服务。</p>
-</li>
-</ul>
-<h2 id="申请SSL证书"><a href="#申请SSL证书" class="headerlink" title="申请SSL证书"></a>申请SSL证书</h2><p>去各大平台申请SSL证书如阿里云、华为云、腾讯云，这里我选择华为云。</p>
-<p>在购买ssl产品前，一定要先详细了解各类型ssl产品，根据自己的公司的类型，选择适合的ssl证书类型</p>
-<p>SSL证书一般分为EV型、OV型、DV型三种类型的证书。</p>
-<p>EV型SSL证书适用：金融（银行、基金、证券、保险）、互联网金融（P2P、基金代销、众筹、融资、投资、理财类）及对安全性标准要求较高的行业。</p>
-<p>OV型SSL证书适用：互联网信息、电子商务、制造行业、运营商、政府、教育等行业。</p>
-<p>DV型SSL证书适用：小型客户、个人及测试使用。</p>
-<p>这里我在华为云选择申请免费的DV型证书。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713225832.png" alt=""></p>
-<h2 id="下载SSL证书，并上传至服务器"><a href="#下载SSL证书，并上传至服务器" class="headerlink" title="下载SSL证书，并上传至服务器"></a>下载SSL证书，并上传至服务器</h2><p>申请成功之后我们需要下载证书到本地，因为我们是通过Nginx服务，所以只解压Nginx文件夹内的证书。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713230109.png" alt=""></p>
-<p>解压完成后可以看到两个文件，我们需要把这两个文件上传至自己的服务器。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713230312.png" alt=""></p>
-<p>在Nginx的主目录，创建一个叫做cert的目录，通过Xftp把上面两个文件传输至此文件夹内。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mkdir /etc/nginx/cert</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713230503.png" alt=""></p>
-<h2 id="修改Nginx的默认配置"><a href="#修改Nginx的默认配置" class="headerlink" title="修改Nginx的默认配置"></a>修改Nginx的默认配置</h2><ul>
-<li>打开Nginx的配置文件</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /etc/nginx/nginx.conf</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>修改Nginx的配置文件为如下，80端口的http服务不需要做更改，把下面代码加入到80端口前面。</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       443 ssl http2 default_server;</span><br><span class="line">    listen       [::]:443 ssl http2 default_server;</span><br><span class="line">    server_name  www.tangxiaoyani.com;</span><br><span class="line">    root         /home/hexoBlog;</span><br><span class="line"></span><br><span class="line">    ssl_certificate <span class="string">"/etc/nginx/cert/server.crt"</span>;</span><br><span class="line">    ssl_certificate_key <span class="string">"/etc/nginx/cert/server.key"</span>;</span><br><span class="line">    ssl_session_cache shared:SSL:1m;</span><br><span class="line">    ssl_session_timeout  10m;</span><br><span class="line">    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;</span><br><span class="line">    ssl_prefer_server_ciphers on;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Load configuration files for the default server block.</span></span><br><span class="line">    include /etc/nginx/default.d/*.conf;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 404 /404.html;</span><br><span class="line">        location = /40x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 500 502 503 504 /50x.html;</span><br><span class="line">        location = /50x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713231602.png" alt=""></p>
-<p>OK，这样https的网页就配置好了，最后我们设置80端口的http服务，这样可以完成如果有人通过http服务访问网页会强制跳转到https页面。</p>
-<h2 id="设置http强制跳转https"><a href="#设置http强制跳转https" class="headerlink" title="设置http强制跳转https"></a>设置http强制跳转https</h2><p>设置非常简单，只需要添加一行代码，但是需要记住，https的代码要写在http的上面。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rewrite ^(.*)$ https://<span class="variable">$host</span><span class="variable">$1</span> permanent;</span><br></pre></td></tr></table></figure>
-
-
-
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713232219.png" alt=""></p>
-]]></content>
-      <categories>
-        <category>Linux</category>
-      </categories>
-      <tags>
-        <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>windows实验</title>
     <url>/2020/07/18/windows%E5%AE%9E%E9%AA%8C/</url>
     <content><![CDATA[<h1 id="Windows实验"><a href="#Windows实验" class="headerlink" title="Windows实验"></a>Windows实验</h1><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/213.jpg" alt=""></p>
+<p><strong>实验目的，搭建故障转移群集，把web与FTP服务的物理目录存放在故障转移服务器上，断开其中一个故障转移节点，验证能否访问web域ftp。</strong></p>
 <a id="more"></a>
 
-<p><strong>实验目的，搭建故障转移群集，把web与FTP服务的物理目录存放在故障转移服务器上，断开其中一个故障转移节点，验证能否访问web域ftp。</strong></p>
 <p><strong>实验环境</strong></p>
 <table>
 <thead>
@@ -277,6 +222,96 @@
       </tags>
   </entry>
   <entry>
+    <title>我的世界Linux开服环境搭建</title>
+    <url>/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711132031.png" alt=""></p>
+<p>现在个人服务器价格以及基本进入大众可消费的水平，不是只有需要架设网站的用户才有服务器需求。我们也也可以来做很多事情，比如说搭建一个Minecraft的服务器，让我们可以很方便的与小伙伴联机，这篇主要就来通过Linux以及MCSM面板教大家搭建一个Minecraft服务器。</p>
+<p><font color=#FF0000 >喜欢或者有问题的同学，可以在下发评论留言哦！</font><a id="more"></a></p>
+<h3 id="MCSM面板搭建意义"><a href="#MCSM面板搭建意义" class="headerlink" title="MCSM面板搭建意义"></a>MCSM面板搭建意义</h3><p>1.方便管理服务器，关闭我的世界服务器以及上传和卸载插件都不用登录服务器执行命令，对新手服主非常友好。</p>
+<p>2.可以实时监控服务器状态，如剩余内存，CPU占用率等…</p>
+<h3 id="前期的准备工作"><a href="#前期的准备工作" class="headerlink" title="前期的准备工作"></a>前期的准备工作</h3><p>1.需要一台服务器，以及安装好Linux系统。    (本教程使用阿里云的学生机，系统使用CentOS7.4)</p>
+<p>2.远程SSH的控制软件。    （本教程使用 Xshell）</p>
+<p>3.我的世界服务器核心。    （本教程使用 KCauldron 1.7.10-1614）</p>
+<p>4.FTP软件,用于上传Minecratf服务器核心到服务器。    (本教程使用Xftp)</p>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>1.推荐使用CentOS系统或者RedHat系统，其他Linux系统理论也能实现，但是命令可能有细微变化，所以本教程不推荐使用。</p>
+<p>2.如果部署失败请耐心重新再次开始，大家都是这样过来的。</p>
+<p>3.本教程不适用小白，如果不会使用SSH工具、安装服务器系统，建议老老实实去淘宝买别人搭建好的。</p>
+<h3 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h3><h4 id="系统更新"><a href="#系统更新" class="headerlink" title="系统更新"></a>系统更新</h4><p>确保你的Linux系统是最新的</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum update</span><br></pre></td></tr></table></figure>
+
+<h4 id="安装node-js"><a href="#安装node-js" class="headerlink" title="安装node.js"></a>安装node.js</h4><p>1.安装<code>github</code></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install git -y</span><br></pre></td></tr></table></figure>
+
+<p>2.安装<code>node.js</code>管理器等组件</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://github.com/creationix/nvm.git ~/nvm</span><br><span class="line"><span class="comment"># 设置nvm 自动运行</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"source ~/nvm/nvm.sh"</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br><span class="line"><span class="comment"># 查询node.js的版本</span></span><br><span class="line">nvm list-remote</span><br><span class="line"><span class="comment"># 安装node.js，目前最新版本为v14.4.0</span></span><br><span class="line">nvm install v14.4.0</span><br></pre></td></tr></table></figure>
+
+<p>3.安装结束之后，请重启服务器（重要！）</p>
+<h4 id="安装Java8"><a href="#安装Java8" class="headerlink" title="安装Java8"></a>安装Java8</h4><p>使用<code>yum</code>安装<code>java8</code>安装</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装java8</span></span><br><span class="line">yum install -y java</span><br><span class="line"><span class="comment">#查看java版本</span></span><br><span class="line">java -version</span><br></pre></td></tr></table></figure>
+
+<p>没有报错，成功回显版本号则安装Java成功</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711163245.png" alt=""></p>
+<h4 id="安装MCSM"><a href="#安装MCSM" class="headerlink" title="安装MCSM"></a>安装MCSM</h4><p>克隆<strong>MCSManager</strong>并安装依赖</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 克隆目录</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/suwings/mcsmanager.git</span><br><span class="line"><span class="comment"># cd至目录</span></span><br><span class="line"><span class="built_in">cd</span> mcsmanager/</span><br><span class="line"><span class="comment"># 安装依赖库</span></span><br><span class="line">npm install</span><br><span class="line"><span class="comment"># 启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
+
+<p>启动成功效果图</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134158.png" alt=""></p>
+<h4 id="保持后台运行"><a href="#保持后台运行" class="headerlink" title="保持后台运行"></a>保持后台运行</h4><p>先<code>Ctrl+C</code>关闭面板，我们使用<code>screen</code>软件来让面板保持后台运行。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装screen</span></span><br><span class="line">yum install screen -y</span><br><span class="line"><span class="comment"># 创建一个名为 mcsm 的窗口</span></span><br><span class="line">screen -S mcsm</span><br><span class="line"><span class="comment"># 在此新终端窗口内启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
+
+<p>开启后可以直接与终端断开连接，面板讲保持后台运行。</p>
+<p><strong>若要重新控制，请输入命令即可：</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">screen -r mcsm</span><br></pre></td></tr></table></figure>
+
+<h3 id="端口开放"><a href="#端口开放" class="headerlink" title="端口开放"></a>端口开放</h3><p>面板需要 23333（主功能） 端口与 20010 - 20200（FTP功能）端口区间。</p>
+<p>Minecraft需要开放25565（我的世界默认）端口号。</p>
+<p>如果你使用阿里云，腾讯云或者服务商，<strong>请进入控制台到防火墙安全组策略，放行以上端口。</strong></p>
+<h3 id="登录MCSM账户"><a href="#登录MCSM账户" class="headerlink" title="登录MCSM账户"></a>登录MCSM账户</h3><p>现在，访问 http://你的公网IP:23333/ 即可进入面板。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 开头带“#”为最高管理员权限（注意，管理员与管理员之间账号可互删）不带“#”为用户账户</span><br><span class="line">默认账号：#master</span><br><span class="line">默认密码: 123456</span><br></pre></td></tr></table></figure>
+
+<p>请及时修改密码。管理员可以互删。</p>
+<h3 id="FTP服务"><a href="#FTP服务" class="headerlink" title="FTP服务"></a>FTP服务</h3><p>需要使用FTP协议上传服务器核心到服务器上。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134440.png" alt=""></p>
+<h3 id="MCSM面板使用"><a href="#MCSM面板使用" class="headerlink" title="MCSM面板使用"></a>MCSM面板使用</h3><p>1.创建实例，这里使用快速创建</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135100.png" alt=""></p>
+<p>2.根据提示设置好参数。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135012.png" alt="[]()"></p>
+<h3 id="开启Minecraft服务器"><a href="#开启Minecraft服务器" class="headerlink" title="开启Minecraft服务器"></a>开启Minecraft服务器</h3><h4 id="EULA最终用户协议"><a href="#EULA最终用户协议" class="headerlink" title="EULA最终用户协议"></a>EULA最终用户协议</h4><p>第一次开服一定失败，返回你的<code>服务器根目录</code>,你会发现多了一个叫做eula.txt的文件，编辑它把 eula=false 改成 eula=true 就行了，这是EULA最终用户许克协议。</p>
+<p><strong>但是</strong>我希望所有服主可以看一看<code>EULA</code></p>
+<p>Minecraft EULA：<a href="https://account.mojang.com/documents/minecraft_eula" target="_blank" rel="noopener">官方汉化链接</a></p>
+<p><strong>以下两条比较重要 我更换了代词方便大家理解</strong></p>
+<ul>
+<li><p>不得将Mojang创建的任何内容用于商业用途；</p>
+</li>
+<li><p>不得试图通过Mojang创建的任何内容赚钱；</p>
+</li>
+</ul>
+<p>这意味着你几乎和开公益服没有区别，但是我们关起门来说话，违反<code>eula</code>的服务器与服主 全世界比比皆是</p>
+<p>这<strong>不代表</strong>你可以认为 你可以光明正大地开商业化服务器</p>
+<p>但在这种大环境下 我相信可怜的绝大部分人 做不到 不违反<code>eula</code></p>
+<p>所以 请你们抱着<strong>内疚，悔恨</strong>的心理 看待你开了违反<code>eula</code>的服务器这一事实</p>
+<p>刚刚气氛好沉重啊 让我们回归主题，继续把服务器开起来吧！</p>
+<h4 id="关闭正版验证"><a href="#关闭正版验证" class="headerlink" title="关闭正版验证"></a>关闭正版验证</h4><p>返回你的<code>服务器根目录</code>找到server.properties这个文件，编辑它，更改 online-mode=true 为online-mode=false</p>
+<p><strong>不关这个正版验证 如果你不是正版玩家你是进不去服务器的</strong></p>
+<p>当然，Mojang已经说过了，如果你现在买不起Minecraft，可以先玩，以后有能力了再来补票。</p>
+<p><strong>注意：</strong>正版玩家和盗版玩家是没有区别的！但我还是希望每个热爱这款游戏，有能力的玩家都可以去支持一下正版。</p>
+<p><strong>做了以上两步操作就可以通过面板开启服务器了</strong></p>
+<h3 id="进入Minecraft服务器"><a href="#进入Minecraft服务器" class="headerlink" title="进入Minecraft服务器"></a>进入Minecraft服务器</h3><p>插一嘴，我建议使用<code>HMCL</code>启动器</p>
+<p>官网链接：<a href="https://hmcl.huangyuhui.net/download" target="_blank" rel="noopener">HMCL启动器</a></p>
+<p>进入游戏之后选择多人游戏，然后添加服务器，服务器地址可以写ip或者域名。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140416.png" alt=""></p>
+<p>添加之后可以看到服务器已经开启，我们双击进入。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140441.png" alt=""></p>
+<p>好的，我们的服务器就这样开起来了，是不是觉得很简单呢。</p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Minecraft</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>本地hexo博客部署到服务器</title>
     <url>/2020/07/11/%E6%9C%AC%E5%9C%B0hexo%E9%83%A8%E7%BD%B2%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8/</url>
     <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/5fddc6d846ac820bd374c9e08366ef94.jpg" alt="">本篇内容用来讲述如何将 hexo 博客部署到阿里云的服务器上。<a id="more"></a><br>只要通过三步即可成功部署：</p>
@@ -418,93 +453,58 @@
       </tags>
   </entry>
   <entry>
-    <title>我的世界Linux开服环境搭建</title>
-    <url>/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711132031.png" alt=""></p>
-<p>现在个人服务器价格以及基本进入大众可消费的水平，不是只有需要架设网站的用户才有服务器需求。我们也也可以来做很多事情，比如说搭建一个Minecraft的服务器，让我们可以很方便的与小伙伴联机，这篇主要就来通过Linux以及MCSM面板教大家搭建一个Minecraft服务器。</p>
-<p><font color=#FF0000 >喜欢或者有问题的同学，可以在下发评论留言哦！</font><a id="more"></a></p>
-<h3 id="MCSM面板搭建意义"><a href="#MCSM面板搭建意义" class="headerlink" title="MCSM面板搭建意义"></a>MCSM面板搭建意义</h3><p>1.方便管理服务器，关闭我的世界服务器以及上传和卸载插件都不用登录服务器执行命令，对新手服主非常友好。</p>
-<p>2.可以实时监控服务器状态，如剩余内存，CPU占用率等…</p>
-<h3 id="前期的准备工作"><a href="#前期的准备工作" class="headerlink" title="前期的准备工作"></a>前期的准备工作</h3><p>1.需要一台服务器，以及安装好Linux系统。    (本教程使用阿里云的学生机，系统使用CentOS7.4)</p>
-<p>2.远程SSH的控制软件。    （本教程使用 Xshell）</p>
-<p>3.我的世界服务器核心。    （本教程使用 KCauldron 1.7.10-1614）</p>
-<p>4.FTP软件,用于上传Minecratf服务器核心到服务器。    (本教程使用Xftp)</p>
-<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>1.推荐使用CentOS系统或者RedHat系统，其他Linux系统理论也能实现，但是命令可能有细微变化，所以本教程不推荐使用。</p>
-<p>2.如果部署失败请耐心重新再次开始，大家都是这样过来的。</p>
-<p>3.本教程不适用小白，如果不会使用SSH工具、安装服务器系统，建议老老实实去淘宝买别人搭建好的。</p>
-<h3 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h3><h4 id="系统更新"><a href="#系统更新" class="headerlink" title="系统更新"></a>系统更新</h4><p>确保你的Linux系统是最新的</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum update</span><br></pre></td></tr></table></figure>
-
-<h4 id="安装node-js"><a href="#安装node-js" class="headerlink" title="安装node.js"></a>安装node.js</h4><p>1.安装<code>github</code></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install git -y</span><br></pre></td></tr></table></figure>
-
-<p>2.安装<code>node.js</code>管理器等组件</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://github.com/creationix/nvm.git ~/nvm</span><br><span class="line"><span class="comment"># 设置nvm 自动运行</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"source ~/nvm/nvm.sh"</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br><span class="line"><span class="comment"># 查询node.js的版本</span></span><br><span class="line">nvm list-remote</span><br><span class="line"><span class="comment"># 安装node.js，目前最新版本为v14.4.0</span></span><br><span class="line">nvm install v14.4.0</span><br></pre></td></tr></table></figure>
-
-<p>3.安装结束之后，请重启服务器（重要！）</p>
-<h4 id="安装Java8"><a href="#安装Java8" class="headerlink" title="安装Java8"></a>安装Java8</h4><p>使用<code>yum</code>安装<code>java8</code>安装</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装java8</span></span><br><span class="line">yum install -y java</span><br><span class="line"><span class="comment">#查看java版本</span></span><br><span class="line">java -version</span><br></pre></td></tr></table></figure>
-
-<p>没有报错，成功回显版本号则安装Java成功</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711163245.png" alt=""></p>
-<h4 id="安装MCSM"><a href="#安装MCSM" class="headerlink" title="安装MCSM"></a>安装MCSM</h4><p>克隆<strong>MCSManager</strong>并安装依赖</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 克隆目录</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/suwings/mcsmanager.git</span><br><span class="line"><span class="comment"># cd至目录</span></span><br><span class="line"><span class="built_in">cd</span> mcsmanager/</span><br><span class="line"><span class="comment"># 安装依赖库</span></span><br><span class="line">npm install</span><br><span class="line"><span class="comment"># 启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
-
-<p>启动成功效果图</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134158.png" alt=""></p>
-<h4 id="保持后台运行"><a href="#保持后台运行" class="headerlink" title="保持后台运行"></a>保持后台运行</h4><p>先<code>Ctrl+C</code>关闭面板，我们使用<code>screen</code>软件来让面板保持后台运行。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装screen</span></span><br><span class="line">yum install screen -y</span><br><span class="line"><span class="comment"># 创建一个名为 mcsm 的窗口</span></span><br><span class="line">screen -S mcsm</span><br><span class="line"><span class="comment"># 在此新终端窗口内启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
-
-<p>开启后可以直接与终端断开连接，面板讲保持后台运行。</p>
-<p><strong>若要重新控制，请输入命令即可：</strong></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">screen -r mcsm</span><br></pre></td></tr></table></figure>
-
-<h3 id="端口开放"><a href="#端口开放" class="headerlink" title="端口开放"></a>端口开放</h3><p>面板需要 23333（主功能） 端口与 20010 - 20200（FTP功能）端口区间。</p>
-<p>Minecraft需要开放25565（我的世界默认）端口号。</p>
-<p>如果你使用阿里云，腾讯云或者服务商，<strong>请进入控制台到防火墙安全组策略，放行以上端口。</strong></p>
-<h3 id="登录MCSM账户"><a href="#登录MCSM账户" class="headerlink" title="登录MCSM账户"></a>登录MCSM账户</h3><p>现在，访问 http://你的公网IP:23333/ 即可进入面板。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 开头带“#”为最高管理员权限（注意，管理员与管理员之间账号可互删）不带“#”为用户账户</span><br><span class="line">默认账号：#master</span><br><span class="line">默认密码: 123456</span><br></pre></td></tr></table></figure>
-
-<p>请及时修改密码。管理员可以互删。</p>
-<h3 id="FTP服务"><a href="#FTP服务" class="headerlink" title="FTP服务"></a>FTP服务</h3><p>需要使用FTP协议上传服务器核心到服务器上。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134440.png" alt=""></p>
-<h3 id="MCSM面板使用"><a href="#MCSM面板使用" class="headerlink" title="MCSM面板使用"></a>MCSM面板使用</h3><p>1.创建实例，这里使用快速创建</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135100.png" alt=""></p>
-<p>2.根据提示设置好参数。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135012.png" alt="[]()"></p>
-<h3 id="开启Minecraft服务器"><a href="#开启Minecraft服务器" class="headerlink" title="开启Minecraft服务器"></a>开启Minecraft服务器</h3><h4 id="EULA最终用户协议"><a href="#EULA最终用户协议" class="headerlink" title="EULA最终用户协议"></a>EULA最终用户协议</h4><p>第一次开服一定失败，返回你的<code>服务器根目录</code>,你会发现多了一个叫做eula.txt的文件，编辑它把 eula=false 改成 eula=true 就行了，这是EULA最终用户许克协议。</p>
-<p><strong>但是</strong>我希望所有服主可以看一看<code>EULA</code></p>
-<p>Minecraft EULA：<a href="https://account.mojang.com/documents/minecraft_eula" target="_blank" rel="noopener">官方汉化链接</a></p>
-<p><strong>以下两条比较重要 我更换了代词方便大家理解</strong></p>
-<ul>
-<li><p>不得将Mojang创建的任何内容用于商业用途；</p>
+    <title>Nginx服务安装SSL证书</title>
+    <url>/2020/07/13/Nginx%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85SSL%E8%AF%81%E4%B9%A6/</url>
+    <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/u=3379754713,1922618047&fm=26&gp=0.jpg" alt=""></p>
+<p>本篇内容用来讲述如何配置Nginx，为服务器安装SSL证书，完成网页通过https的访问。<a id="more"></a></p>
+<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><ul>
+<li><p>准备文件远程传输软件，例如Xftp，WinSCP，FinalShell等（建议从官网下载最新版本）</p>
 </li>
-<li><p>不得试图通过Mojang创建的任何内容赚钱；</p>
+<li><p>准备远程登录工具，例如FinalShell，Xshell等（建议从官网下载最新版本）</p>
+</li>
+<li><p>配置好服务器，并已在当前服务器中安装配置 Nginx 服务。</p>
 </li>
 </ul>
-<p>这意味着你几乎和开公益服没有区别，但是我们关起门来说话，违反<code>eula</code>的服务器与服主 全世界比比皆是</p>
-<p>这<strong>不代表</strong>你可以认为 你可以光明正大地开商业化服务器</p>
-<p>但在这种大环境下 我相信可怜的绝大部分人 做不到 不违反<code>eula</code></p>
-<p>所以 请你们抱着<strong>内疚，悔恨</strong>的心理 看待你开了违反<code>eula</code>的服务器这一事实</p>
-<p>刚刚气氛好沉重啊 让我们回归主题，继续把服务器开起来吧！</p>
-<h4 id="关闭正版验证"><a href="#关闭正版验证" class="headerlink" title="关闭正版验证"></a>关闭正版验证</h4><p>返回你的<code>服务器根目录</code>找到server.properties这个文件，编辑它，更改 online-mode=true 为online-mode=false</p>
-<p><strong>不关这个正版验证 如果你不是正版玩家你是进不去服务器的</strong></p>
-<p>当然，Mojang已经说过了，如果你现在买不起Minecraft，可以先玩，以后有能力了再来补票。</p>
-<p><strong>注意：</strong>正版玩家和盗版玩家是没有区别的！但我还是希望每个热爱这款游戏，有能力的玩家都可以去支持一下正版。</p>
-<p><strong>做了以上两步操作就可以通过面板开启服务器了</strong></p>
-<h3 id="进入Minecraft服务器"><a href="#进入Minecraft服务器" class="headerlink" title="进入Minecraft服务器"></a>进入Minecraft服务器</h3><p>插一嘴，我建议使用<code>HMCL</code>启动器</p>
-<p>官网链接：<a href="https://hmcl.huangyuhui.net/download" target="_blank" rel="noopener">HMCL启动器</a></p>
-<p>进入游戏之后选择多人游戏，然后添加服务器，服务器地址可以写ip或者域名。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140416.png" alt=""></p>
-<p>添加之后可以看到服务器已经开启，我们双击进入。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140441.png" alt=""></p>
-<p>好的，我们的服务器就这样开起来了，是不是觉得很简单呢。</p>
+<h2 id="申请SSL证书"><a href="#申请SSL证书" class="headerlink" title="申请SSL证书"></a>申请SSL证书</h2><p>去各大平台申请SSL证书如阿里云、华为云、腾讯云，这里我选择华为云。</p>
+<p>在购买ssl产品前，一定要先详细了解各类型ssl产品，根据自己的公司的类型，选择适合的ssl证书类型</p>
+<p>SSL证书一般分为EV型、OV型、DV型三种类型的证书。</p>
+<p>EV型SSL证书适用：金融（银行、基金、证券、保险）、互联网金融（P2P、基金代销、众筹、融资、投资、理财类）及对安全性标准要求较高的行业。</p>
+<p>OV型SSL证书适用：互联网信息、电子商务、制造行业、运营商、政府、教育等行业。</p>
+<p>DV型SSL证书适用：小型客户、个人及测试使用。</p>
+<p>这里我在华为云选择申请免费的DV型证书。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713225832.png" alt=""></p>
+<h2 id="下载SSL证书，并上传至服务器"><a href="#下载SSL证书，并上传至服务器" class="headerlink" title="下载SSL证书，并上传至服务器"></a>下载SSL证书，并上传至服务器</h2><p>申请成功之后我们需要下载证书到本地，因为我们是通过Nginx服务，所以只解压Nginx文件夹内的证书。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713230109.png" alt=""></p>
+<p>解压完成后可以看到两个文件，我们需要把这两个文件上传至自己的服务器。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713230312.png" alt=""></p>
+<p>在Nginx的主目录，创建一个叫做cert的目录，通过Xftp把上面两个文件传输至此文件夹内。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mkdir /etc/nginx/cert</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713230503.png" alt=""></p>
+<h2 id="修改Nginx的默认配置"><a href="#修改Nginx的默认配置" class="headerlink" title="修改Nginx的默认配置"></a>修改Nginx的默认配置</h2><ul>
+<li>打开Nginx的配置文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /etc/nginx/nginx.conf</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>修改Nginx的配置文件为如下，80端口的http服务不需要做更改，把下面代码加入到80端口前面。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       443 ssl http2 default_server;</span><br><span class="line">    listen       [::]:443 ssl http2 default_server;</span><br><span class="line">    server_name  www.tangxiaoyani.com;</span><br><span class="line">    root         /home/hexoBlog;</span><br><span class="line"></span><br><span class="line">    ssl_certificate <span class="string">"/etc/nginx/cert/server.crt"</span>;</span><br><span class="line">    ssl_certificate_key <span class="string">"/etc/nginx/cert/server.key"</span>;</span><br><span class="line">    ssl_session_cache shared:SSL:1m;</span><br><span class="line">    ssl_session_timeout  10m;</span><br><span class="line">    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;</span><br><span class="line">    ssl_prefer_server_ciphers on;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Load configuration files for the default server block.</span></span><br><span class="line">    include /etc/nginx/default.d/*.conf;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 404 /404.html;</span><br><span class="line">        location = /40x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 500 502 503 504 /50x.html;</span><br><span class="line">        location = /50x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713231602.png" alt=""></p>
+<p>OK，这样https的网页就配置好了，最后我们设置80端口的http服务，这样可以完成如果有人通过http服务访问网页会强制跳转到https页面。</p>
+<h2 id="设置http强制跳转https"><a href="#设置http强制跳转https" class="headerlink" title="设置http强制跳转https"></a>设置http强制跳转https</h2><p>设置非常简单，只需要添加一行代码，但是需要记住，https的代码要写在http的上面。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rewrite ^(.*)$ https://<span class="variable">$host</span><span class="variable">$1</span> permanent;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200713232219.png" alt=""></p>
 ]]></content>
       <categories>
         <category>Linux</category>
       </categories>
       <tags>
-        <tag>Minecraft</tag>
+        <tag>hexo</tag>
       </tags>
   </entry>
 </search>
