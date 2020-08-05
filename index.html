@@ -314,7 +314,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-08-05 23:26:22 / 修改时间：23:27:58" itemprop="dateCreated datePublished" datetime="2020-08-05T23:26:22+08:00">2020-08-05</time>
+              <time title="创建时间：2020-08-05 23:26:22 / 修改时间：23:29:36" itemprop="dateCreated datePublished" datetime="2020-08-05T23:26:22+08:00">2020-08-05</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -359,28 +359,14 @@
 
 <p>配置vsftpd开启匿名访问</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line">anonymous_enable=YES			//允许匿名登录（默认开启）</span><br><span class="line">anon_upload_enable=YES			//允许匿名上传</span><br><span class="line">anon_mkdir_write_enable=YES		//允许匿名创建文件夹，但是不能删除</span><br><span class="line">anon_other_write_enable=YES		//允许匿名创建和删除</span><br><span class="line">[root@localhost ~]<span class="comment"># service vsftpd start</span></span><br><span class="line">Starting vsftpd <span class="keyword">for</span> vsftpd:                                [  OK  ]</span><br></pre></td></tr></table></figure>
-
-<p>设置匿名用户默认访问路径的权限</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># chmod 757 /var/ftp/pub</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ll /var/ftp</span></span><br><span class="line">total 4</span><br><span class="line">drwxr-xrwx. 2 root root 4096 Mar  1  2013 pub</span><br></pre></td></tr></table></figure>
-
-<p>Win10测试创建文件：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805160835.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805160915.png" alt=""></p>
-<h2 id="虚拟用户访问"><a href="#虚拟用户访问" class="headerlink" title="虚拟用户访问"></a>虚拟用户访问</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/yum.repos.d/dd.repo</span></span><br><span class="line">	enabled=0		//禁用本地源，更改为网络源。</span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y  db* pam*</span></span><br></pre></td></tr></table></figure>
-
-<p>配置虚拟用户</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /etc/vsftpd</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim /etc/vsftpd/ftpusers.txt	//奇数行为用户名，偶数行为密码</span></span><br><span class="line">tangxiaoyan		</span><br><span class="line">123</span><br><span class="line">yanxiaotang</span><br><span class="line">321</span><br><span class="line"></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># db_load -T -t hash -f ftpusers.txt ftpuser.db</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim /etc/pam.d/vsftpd</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># useradd -d /home/ftpusers -s /bin/nologin ftpusers</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line"></span><br><span class="line">ascii_upload_enable=YES</span><br><span class="line">ascii_download_enable=YES</span><br><span class="line">guest_enable=YES</span><br><span class="line">guest_username=ftpusers</span><br><span class="line">user_config_dir=/etc/vsftpd/vsftpd_user_conf</span><br><span class="line">virtual_use_local_privs=YES</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># service vsftpd restart</span></span><br><span class="line">Shutting down vsftpd:                                      [  OK  ]</span><br><span class="line">Starting vsftpd <span class="keyword">for</span> vsftpd:                                [  OK  ]</span><br></pre></td></tr></table></figure>
-
-<p>windows验证：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175137.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175155.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175221.png" alt=""></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost vsftpd]<span class="comment"># mkdir vsftpd_user_conf</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim vsftpd_user_conf/tom</span></span><br><span class="line">local_root=/opt/kl</span><br><span class="line">[root@localhost vsftpd]<span class="comment"># mkdir /opt/kl</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># chmod 777 /opt/kl</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># service vsftpd restart</span></span><br><span class="line">Shutting down vsftpd:                                      [  OK  ]</span><br><span class="line">Starting vsftpd <span class="keyword">for</span> vsftpd:                                [  OK  ]</span><br></pre></td></tr></table></figure>
-
-<p>windows登录tom用户然后创建文件夹</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175655.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175531.png" alt=""></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/08/05/vsftpd%E6%9C%8D%E5%8A%A1/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
