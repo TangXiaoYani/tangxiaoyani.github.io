@@ -1,48 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Linux配置DNS解析服务</title>
-    <url>/2020/07/29/Linux%E9%85%8D%E7%BD%AEDNS%E8%A7%A3%E6%9E%90%E6%9C%8D%E5%8A%A1/</url>
-    <content><![CDATA[<h2 id="关于Linux如何配置DNS解析"><a href="#关于Linux如何配置DNS解析" class="headerlink" title="关于Linux如何配置DNS解析"></a>关于Linux如何配置DNS解析</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/1234.jpg" alt=""></p>
-<a id="more"></a>
-
-<p>Server配置：</p>
-<p>配置好Server的ip：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># ip a</span></span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN </span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000</span><br><span class="line">    link/ether 00:0c:29:f6:1e:cf brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.211.150/24 brd 192.168.211.255 scope global eth0</span><br><span class="line">    inet6 fe80::20c:29ff:fef6:1ecf/64 scope link </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure>
-
-<p>关闭防火墙：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># service iptables stop		//关闭防火墙</span></span><br><span class="line">iptables: Setting chains to policy ACCEPT: filter          [  OK  ]</span><br><span class="line">iptables: Flushing firewall rules:                         [  OK  ]</span><br><span class="line">iptables: Unloading modules:                               [  OK  ]</span><br><span class="line">[root@server ~]<span class="comment"># chkconfig iptables off		//永久关闭防火墙</span></span><br><span class="line">[root@server ~]<span class="comment"># service iptables status	//查看防火墙的状态</span></span><br><span class="line">iptables: Firewall is not running.</span><br><span class="line">[root@server ~]<span class="comment"># getenforce		</span></span><br><span class="line">Enforcing</span><br><span class="line">[root@server ~]<span class="comment"># setenforce 0		//临时关闭防火墙</span></span><br><span class="line">[root@server ~]<span class="comment"># getenforce</span></span><br><span class="line">Permissive</span><br></pre></td></tr></table></figure>
-
-<p>安装服务以及配置文件：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># yum install -y bind</span></span><br><span class="line">[root@server ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line">options &#123;</span><br><span class="line">	listen-on port 53 &#123; any; &#125;;		//括号内的内容改为any（监听端口作用）</span><br><span class="line">//	listen-on-v6 port 53 &#123; ::1; &#125;;	//注释掉IPV6</span><br><span class="line">	directory 	<span class="string">"/var/named"</span>;</span><br><span class="line">	dump-file 	<span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line">        statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line">        memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line">	allow-query     &#123; any; &#125;;		//括号内的内容改为any(允许访问的IP)</span><br><span class="line">	recursion yes;</span><br><span class="line"></span><br><span class="line">[root@server ~]<span class="comment"># vim /etc/named.rfc1912.zones </span></span><br><span class="line">zone <span class="string">"zsh.com"</span> IN &#123;				//修改此处</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"name.zsh.com"</span>;		//修改此处</span><br><span class="line">	allow-update &#123; none; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"localhost"</span> IN &#123;</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"named.localhost"</span>;</span><br><span class="line">	allow-update &#123; none; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa"</span> IN &#123;</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"named.loopback"</span>;</span><br><span class="line">	allow-update &#123; none; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"211.128.192.in-addr.arpa"</span> IN &#123;	//修改此处</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"211.168.192.arpa"</span>;			//修改此处</span><br><span class="line">	allow-update &#123; none; &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># cp /var/named/named.localhost /var/named/www.zsh.com</span></span><br><span class="line">[root@server ~]<span class="comment"># vim /var/named/www.zsh.com</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  zsh.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">@       IN      NS      server.zsh.com.</span><br><span class="line">server  IN      A       192.168.211.150</span><br><span class="line">client  IN      A       192.168.211.151</span><br><span class="line">www     IN      A       192.168.211.120</span><br><span class="line"></span><br><span class="line">//参数解析</span><br><span class="line">@：该域的父域，此处为zsh.com</span><br><span class="line">IN:ininternet,使用TCP/IP协议</span><br><span class="line">SOA：设置授权主机名</span><br><span class="line">serial:序列号，当主DNS服务器更新数据后，增到该值，从服务器才会更新数据</span><br><span class="line">refresh:从服务器于主服务器序列号做对比</span><br><span class="line">retry:refresh失败后，经过指定时间再去尝试</span><br><span class="line">expire：从DNS服务器过期时间</span><br><span class="line">minimum：否定结果缓存时间</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># cp /var/named/named.localhost /var/named/211.168.192.arpa</span></span><br><span class="line">[root@server ~]<span class="comment"># vim /var/named/211.168.192.arpa</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@	IN SOA	zsh.com. rname.invalid. (</span><br><span class="line">					0	; serial</span><br><span class="line">					1D	; refresh</span><br><span class="line">					1H	; retry</span><br><span class="line">					1W	; expire</span><br><span class="line">					3H )	; minimum</span><br><span class="line">@	IN	NS	server.zsh.com.</span><br><span class="line">150	IN	PTR	server.zsh.com</span><br><span class="line">151	IN	PTR	client.zsh.com</span><br><span class="line">120	IN	PTR 	www.zsh.com</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># service named restart		//重启服务</span></span><br><span class="line">Stopping named: .                                          [  OK  ]</span><br><span class="line">Starting named:                                            [  OK  ]</span><br><span class="line"></span><br><span class="line">//给予named程序对于正向反向解析文件的读取权限，不然可能查询失败</span><br><span class="line">[root@server ~]<span class="comment"># chown named:named /var/named/name.zsh.com</span></span><br><span class="line">[root@server ~]<span class="comment"># chown named:named /var/named/211.168.192.arpa</span></span><br></pre></td></tr></table></figure>
-
-<p>客户端测试：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@client ~]<span class="comment"># yum install -y bind-utils</span></span><br><span class="line">[root@client ~]<span class="comment"># vim /etc/resolv.conf	//设置DNS指向server</span></span><br><span class="line">	nameserver 192.168.211.150</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200729172852.png" alt=""></p>
-<h2 id="DNS主从服务器配置"><a href="#DNS主从服务器配置" class="headerlink" title="DNS主从服务器配置"></a>DNS主从服务器配置</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># ntpdate ntp.api.bz		//同步时间，从服务器也要做，这里我以客户端为从服务器</span></span><br><span class="line">29 Jul 01:30:47 ntpdate[3328]: step time server 114.118.7.163 offset 1955698.964697 sec</span><br><span class="line"></span><br><span class="line">[root@client ~]<span class="comment"># ntpdate ntp.api.bz		//客户机也需要同步。</span></span><br><span class="line">29 Jul 17:33:41 ntpdate[2035]: step time server 114.118.7.161 offset -28799.915217 sec</span><br><span class="line"></span><br><span class="line">[root@server ~]<span class="comment"># cat /etc/named.rfc1912.zones</span></span><br><span class="line">zone <span class="string">"zsh.com"</span> IN &#123;</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"name.zsh.com"</span>;</span><br><span class="line">	allow-transfer &#123; 192.168.211.151; &#125;;		//允许同步的辅助DNS服务器</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"211.168.192.in-addr.arpa"</span> IN &#123;</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"211.168.192.arpa"</span>;</span><br><span class="line">	allow-transfer &#123; 192.168.211.151; &#125;;		//允许同步的辅助DNS服务器</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">[root@server ~]<span class="comment"># vim /var/named/name.zsh.com</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  zsh.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">@       IN      NS      server.zsh.com.</span><br><span class="line">@       IN      NS      client.zsh.com.		//添加该从服务器</span><br><span class="line">server  IN      A       192.168.211.150</span><br><span class="line">client  IN      A       192.168.211.151</span><br><span class="line">www     IN      A       192.168.211.120</span><br><span class="line"></span><br><span class="line">[root@server ~]<span class="comment"># vim /var/named/name.211.128.192.arpa</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  zsh.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">@       IN      NS      server.zsh.com.</span><br><span class="line">@       IN      NS      client.zsh.com.		//添加该从服务器</span><br><span class="line">150     IN      PTR     server.zsh.com</span><br><span class="line">151     IN      PTR     client.zsh.com</span><br><span class="line">120     IN      PTR     www.zsh.com</span><br></pre></td></tr></table></figure>
-
-<p>从服务器配置</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@client ~]<span class="comment"># yum install -y bind</span></span><br><span class="line">[root@client etc]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line">options &#123;</span><br><span class="line">        listen-on port 53 &#123; any; &#125;;</span><br><span class="line">//      listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line">        directory       <span class="string">"/var/named"</span>;</span><br><span class="line">        dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line">        statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line">        memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line">        allow-query     &#123; any; &#125;;</span><br><span class="line">        recursion yes;</span><br><span class="line"></span><br><span class="line">        dnssec-enable no;		//“yes”改为“no”</span><br><span class="line">        dnssec-validation no;	//“yes”改为“no”</span><br><span class="line">        </span><br><span class="line">[root@client ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line">zone <span class="string">"zsh.com"</span> IN &#123;</span><br><span class="line">        <span class="built_in">type</span> slave;		//类型更改为slave</span><br><span class="line">        file <span class="string">"slaves/name.zsh.com"</span>;		//这里是slaves目录下的正向解析文件，必须是这个目录名</span><br><span class="line">        masters &#123; 192.168.211.150; &#125;;		//设置主的服务器地址</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"211.168.192.in-addr.arpa"</span> IN &#123;</span><br><span class="line">        <span class="built_in">type</span> slave;		//类型更改为slave</span><br><span class="line">        file <span class="string">"slaves/211.168.192.arpa"</span>;</span><br><span class="line">        masters &#123; 192.168.211.150; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">[root@client slaves]<span class="comment"># service named restart</span></span><br><span class="line">停止 named：                                               [确定]</span><br><span class="line">启动 named：                                               [确定]</span><br><span class="line"></span><br><span class="line">[root@client ~]<span class="comment"># ls /var/named/slaves</span></span><br><span class="line">211.168.192.arpa  name.zsh.com</span><br><span class="line"></span><br><span class="line">[root@client ~]<span class="comment"># setenforce 0</span></span><br><span class="line">[root@client ~]<span class="comment"># getenforce</span></span><br><span class="line">Permissive</span><br><span class="line">[root@client ~]<span class="comment"># service iptables stop</span></span><br><span class="line">iptables：将链设置为政策 ACCEPT：filter                    [确定]</span><br><span class="line">iptables：清除防火墙规则：                                 [确定]</span><br><span class="line">iptables：正在卸载模块：                                   [确定]</span><br></pre></td></tr></table></figure>
-
-<p>验证：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200729180917.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200729181037.png" alt=""></p>
-]]></content>
-      <categories>
-        <category>Linux</category>
-      </categories>
-      <tags>
-        <tag>DNS服务</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Nginx服务安装SSL证书</title>
     <url>/2020/07/13/Nginx%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85SSL%E8%AF%81%E4%B9%A6/</url>
     <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/u=3379754713,1922618047&fm=26&gp=0.jpg" alt=""></p>
@@ -95,37 +53,6 @@
       </categories>
       <tags>
         <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>OSPF</title>
-    <url>/2020/07/23/OSPF/</url>
-    <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/1345.jpg" alt=""></p>
-<p>通过OSPF使全网互通。</p>
-<a id="more"></a>
-
-<p>实验拓扑：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723103018.png" alt=""></p>
-<p>目的：使用OSPF协议使R4与R5互通。</p>
-<p>R4：<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723102307.png" alt=""></p>
-<p>R2：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723103046.png" alt=""></p>
-<p>R1：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723111321.png" alt=""></p>
-<p>R3：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723110558.png" alt=""></p>
-<p>R1：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723112036.png" alt=""></p>
-<p>R5：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/image-20200723112809309.png" alt=""></p>
-<p>Ping:</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723112921.png" alt=""></p>
-]]></content>
-      <categories>
-        <category>网络</category>
-      </categories>
-      <tags>
-        <tag>OSPF</tag>
       </tags>
   </entry>
   <entry>
@@ -298,7 +225,7 @@
   </entry>
   <entry>
     <title>Samba服务配置</title>
-    <url>/2020/08/04/samba/</url>
+    <url>/2020/08/04/Samba/</url>
     <content><![CDATA[<h2 id="实验环境："><a href="#实验环境：" class="headerlink" title="实验环境："></a>实验环境：</h2><p>​        Server        CentOS6.5</p>
 <p>​        Client         CentOS6.5</p>
 <h2 id="实验需求："><a href="#实验需求：" class="headerlink" title="实验需求："></a>实验需求：</h2><p>​                    name实际共享路径：/opt/you</p>
@@ -313,6 +240,10 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># setenforce 0				//服务端和客户端都要做</span></span><br><span class="line">[root@server ~]<span class="comment"># service iptables stop</span></span><br><span class="line">iptables: Setting chains to policy ACCEPT: filter          [  OK  ]</span><br><span class="line">iptables: Flushing firewall rules:                         [  OK  ]</span><br><span class="line">iptables: Unloading modules:                               [  OK  ]</span><br><span class="line">[root@server ~]<span class="comment"># yum install -y samba</span></span><br><span class="line">[root@server ~]<span class="comment"># vim /etc/samba/smb.conf </span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ----------------------- Standalone Server Options ------------------------</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Scurity can be set to user, share(deprecated) or server(deprecated)</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Backend to store user information in. New installations should </span></span><br><span class="line"><span class="comment"># use either tdbsam or ldapsam. smbpasswd is available for backwards </span></span><br><span class="line"><span class="comment"># compatibility. tdbsam requires no further configuration.</span></span><br><span class="line"></span><br><span class="line">        security = share		//修改此处</span><br><span class="line">        passdb backend = tdbsam</span><br><span class="line">        </span><br><span class="line">        [name]</span><br><span class="line">        comment = Name			//注释</span><br><span class="line">        path = /opt/you			//共享路径</span><br><span class="line">        public = yes			//是否匿名能访问</span><br><span class="line">        writable = yes			//是否可写	</span><br><span class="line">        browseable = yes		//是否可浏览</span><br><span class="line">        create mask =0644		//设置上传的文件的权限</span><br><span class="line">        directory mask =0755	//设置创建目录的权限</span><br><span class="line">       </span><br><span class="line">       	[kpl]</span><br><span class="line">        comment = KPL</span><br><span class="line">        path = /opt/hn</span><br><span class="line">        writable = yes</span><br><span class="line">        public = yes</span><br><span class="line">        browseable = yes</span><br><span class="line">        create mask = 0644</span><br><span class="line">        directory mask = 0755</span><br><span class="line">        </span><br><span class="line">[root@server ~]<span class="comment"># testparm		//测试smb.conf是否有问题</span></span><br><span class="line">[root@server ~]<span class="comment"># mkdir /opt/you &amp;&amp;mkdir /opt/hn</span></span><br><span class="line">[root@server opt]<span class="comment"># cd /opt</span></span><br><span class="line">[root@server opt]<span class="comment"># chmod 753 you	//相对于该目录来说，匿名访问使用的是其它人的权限</span></span><br><span class="line">[root@server opt]<span class="comment"># chmod 755 hn</span></span><br><span class="line">[root@server opt]<span class="comment"># service smb start</span></span><br><span class="line">Starting SMB services:                                     [  OK  ]</span><br><span class="line">[root@server opt]<span class="comment"># service nmb start</span></span><br><span class="line">Starting NMB services:                                     [  OK  ]</span><br></pre></td></tr></table></figure>
 
 <p>客户端验证1：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@client ~]<span class="comment"># yum install -y cifs-utils samba-client</span></span><br></pre></td></tr></table></figure>
+
+
+
 <p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200804005737.png" alt=""></p>
 <p>返回服务端验证：</p>
 <p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200804005842.png" alt=""></p>
@@ -344,109 +275,107 @@
       </tags>
   </entry>
   <entry>
-    <title>单臂路由</title>
-    <url>/2020/08/01/%E5%8D%95%E8%87%82%E8%B7%AF%E7%94%B1/</url>
-    <content><![CDATA[<h2 id="实验名称：单臂路由实现不同VLAN间通信"><a href="#实验名称：单臂路由实现不同VLAN间通信" class="headerlink" title="实验名称：单臂路由实现不同VLAN间通信"></a>实验名称：单臂路由实现不同VLAN间通信</h2><h2 id="实验拓扑："><a href="#实验拓扑：" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200731231440.png" alt=""></p>
+    <title>STP生成树协议</title>
+    <url>/2020/08/05/STP%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE/</url>
+    <content><![CDATA[<h2 id="实验名称：STP生成树实验"><a href="#实验名称：STP生成树实验" class="headerlink" title="实验名称：STP生成树实验"></a>实验名称：STP生成树实验</h2><h2 id="实验拓扑："><a href="#实验拓扑：" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805184356.png" alt=""></p>
 <a id="more"></a>
 
-<h2 id="实验需求："><a href="#实验需求：" class="headerlink" title="实验需求："></a>实验需求：</h2><p>通过单臂路由实现VLAN10与VLAN20通信</p>
-<table>
-<thead>
-<tr>
-<th align="left"></th>
-<th align="center">PC3</th>
-<th align="center">PC4</th>
-<th align="center">R1的e0/0.1</th>
-<th align="center">R1的e0/0.2</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">IP地址</td>
-<td align="center">10.0.0.10/24</td>
-<td align="center">20.0.0.20/24</td>
-<td align="center">10.0.0.1/24</td>
-<td align="center">20.0.0.1/24</td>
-</tr>
-</tbody></table>
-<h2 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h2><p>R1与SW之间配置Trunk链路，PC与SW之间配置access链路，路由器配置虚拟接口，然后实现VLAN10与VLAN20通信也就是PC3可以ping通PC4。</p>
-<h2 id="实验步骤："><a href="#实验步骤：" class="headerlink" title="实验步骤："></a>实验步骤：</h2><p>R1:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Router(config)<span class="comment">#int e0/0		</span></span><br><span class="line">Router(config)<span class="comment">#no shudown		//必须开启物理接口</span></span><br><span class="line">Router(config)<span class="comment">#int e0/0.1		//进入子接口</span></span><br><span class="line">Router(config-subif)<span class="comment">#encapsulation dot1q 10		//首先配置子接口对应的VLAN</span></span><br><span class="line">Router(config-subif)<span class="comment">#ip add 10.0.0.1 255.255.255.0	//再配置子接口的IP地址</span></span><br><span class="line">Router(config-subif)<span class="comment">#no shutdown	//开启接口</span></span><br><span class="line">Router(config-subif)<span class="comment">#int e0/0.2</span></span><br><span class="line">Router(config-subif)<span class="comment">#encapsulation dot1q 20</span></span><br><span class="line">Router(config-subif)<span class="comment">#ip add 20.0.0.1 255.255.255.0</span></span><br><span class="line">Router(config-subif)<span class="comment">#no shutdown</span></span><br></pre></td></tr></table></figure>
+<h2 id="实验需求："><a href="#实验需求：" class="headerlink" title="实验需求："></a>实验需求：</h2><p>在sw1 2 3 上分别创建vlan10,11,12，在交换机上进行vlan的划分，交换机之间使用trunk链路，sw1为vlan10，vlan11的根网桥，sw2为备份网桥，sw2为vlan12的网桥，vlan10,11为备份，然后全网互通。</p>
+<h2 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h2><p>首先配置好基本链路模式，如交换机与交换机之间配置trunk，与主机之间配置access链路，然后在SW1上配置好虚接口设置好网关，在配置STP生成树协议选择阻塞的端口。</p>
+<h1 id="实验步骤："><a href="#实验步骤：" class="headerlink" title="实验步骤："></a>实验步骤：</h1><p>SW1:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#vlan 10,11,12</span></span><br><span class="line">Switch(config-vlan)<span class="comment">#exit </span></span><br><span class="line">Switch(config)<span class="comment">#int vlan 10</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:00:43.816: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan10, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#ip add 192.168.10.1 255.255.255.0</span></span><br><span class="line">Switch(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:01:11.706: %LINK-3-UPDOWN: Interface Vlan10, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#int vlan 11</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:01:18.298: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan11, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#ip add 192.168.11.1 255.255.255.0</span></span><br><span class="line">Switch(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:01:35.193: %LINK-3-UPDOWN: Interface Vlan11, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#int vlan 12</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:01:39.011: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan12, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#ip add 192.168.12.1 255.255.255.0</span></span><br><span class="line">Switch(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:02:07.359: %LINK-3-UPDOWN: Interface Vlan12, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#spanning-tree vlan 11,12,10</span></span><br><span class="line">Switch(config)<span class="comment">#spanning-tree vlan 11,10 root primary	//指定为根网桥</span></span><br><span class="line">Switch(config)<span class="comment">#spanning-tree vlan 12 root secondary   	//指定为备份网桥</span></span><br><span class="line">Switch(config)<span class="comment">#int e0/0</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport trunk en dot1q </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk          </span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:16:00.827: %LINK-3-UPDOWN: Interface Vlan12, changed state to up</span><br><span class="line">*Aug  5 16:16:01.829: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan12, changed state to up</span><br><span class="line">Switch(config-if)<span class="comment">#int e0/1</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport trunk en dot1q</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk </span></span><br><span class="line">Switch(config-if)<span class="comment">#inte e1/1         </span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:16:30.827: %LINK-3-UPDOWN: Interface Vlan10, changed state to up</span><br><span class="line">*Aug  5 16:16:30.827: %LINK-3-UPDOWN: Interface Vlan11, changed state to up</span><br><span class="line">*Aug  5 16:16:31.836: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan10, changed state to up</span><br><span class="line">*Aug  5 16:16:31.836: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan11, changed state to up</span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 12</span></span><br><span class="line">Switch(config-if)<span class="comment">#inte e1/2                </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 11</span></span><br><span class="line">Switch(config-if)<span class="comment">#int e1/3</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 10</span></span><br><span class="line">Switch(config-if)<span class="comment">#exit       </span></span><br><span class="line">Switch(config)<span class="comment">#do show spanning-tree</span></span><br></pre></td></tr></table></figure>
 
-<p>查看端口状态：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200731235334.png" alt=""></p>
-<p>SW:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#int e0/1</span></span><br><span class="line">Switch(config-if)<span class="comment">#switch</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 10</span></span><br><span class="line">Switch(config-if)<span class="comment">#exit</span></span><br><span class="line">Switch(config)<span class="comment">#int e0/2</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 20</span></span><br><span class="line">Switch(config-if)<span class="comment">#exit</span></span><br><span class="line">Switch(config)<span class="comment">#int e0/0</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport trunk encapsulation dot1q </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Jul 31 23:19:08.365: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Jul 31 23:19:11.371: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br></pre></td></tr></table></figure>
-
-<p>PC3:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 10.0.0.10 10.0.0.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 10.0.0.10 255.255.255.0 gateway 10.0.0.1</span><br></pre></td></tr></table></figure>
-
-<p>PC4:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 20.0.0.20 20.0.0.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 20.0.0.20 255.255.255.0 gateway 20.0.0.1</span><br></pre></td></tr></table></figure>
-
-<p>查看R1的路由表：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200731235503.png" alt=""></p>
-<p>从Pc3 Ping通 Pc4</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200731235728.png" alt=""></p>
-<h2 id="实验总结："><a href="#实验总结：" class="headerlink" title="实验总结："></a>实验总结：</h2><p>开启子接口的前提是开启物理接口，子接口要先配置对应的VLAN再配置IP地址，交换机连接主机的端口使用access链路，交换机连接路由器的端口为trunk链路，通过单臂路由可以实现交换机不同VLAN直接的通信。</p>
-<hr>
-<h2 id="实验名称-配置DHCP服务"><a href="#实验名称-配置DHCP服务" class="headerlink" title="实验名称:配置DHCP服务"></a>实验名称:配置DHCP服务</h2><h2 id="实验拓扑：-1"><a href="#实验拓扑：-1" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801000423.png" alt=""></p>
-<h2 id="实验需求：-1"><a href="#实验需求：-1" class="headerlink" title="实验需求："></a>实验需求：</h2><p>通过DHCP自动为PC3,PC4分配IP地址，并预留两台打印机的IP地址。</p>
-<p>设置Vlan10和Vlan20的地址池分别为192.168.1.0/24与192.168.2.0/24</p>
-<p>分别预留192.168.1.100和192.168.1.33</p>
-<p>DHCP地址池范围为192.168.1.0</p>
-<p>为客户端配置DNS地址为202.106.0.20以及202.106.148.1</p>
-<p>IP地址的租期为2天</p>
-<h2 id="解题思路：-1"><a href="#解题思路：-1" class="headerlink" title="解题思路："></a>解题思路：</h2><h2 id="实验步骤：-1"><a href="#实验步骤：-1" class="headerlink" title="实验步骤："></a>实验步骤：</h2><p>R1：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Router(config)<span class="comment">#ip dhcp pool VLAN 10		//配置VLAN10的地址池</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#network 192.168.1.0 255.255.255.0    //指定地址池的范围</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#default-router 192.168.1.1		//指定网关</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#dns-server 202.106.0.20 202.106.148.1	//指定DNS</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#lease 2		//指定DHCP使用天数</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#exit	</span></span><br><span class="line">Router(config)<span class="comment">#ip dhcp excluded-address 192.168.1.100	//设置DHCP保留地址</span></span><br><span class="line">Router(config)<span class="comment">#ip dhcp excluded-address 192.168.1.33 </span></span><br><span class="line">Router(config)<span class="comment">#ip dhcp pool VLAN 20</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#network 192.168.2.0 255.255.255.0</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#default-router 192.168.2.1</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#dns-server 202.106.0.20 202.106.148.1</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#lease 2</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#int e0/0</span></span><br><span class="line">Router(config-if)<span class="comment">#no shutdow</span></span><br><span class="line">Router(config-if)<span class="comment">#int e0/0.1</span></span><br><span class="line">Router(config-subif)<span class="comment">#encapsulation dot1q 10</span></span><br><span class="line">Router(config-subif)<span class="comment">#ip add 192.168.1.1 255.255.255.0</span></span><br><span class="line">Router(config-subif)<span class="comment">#int e0/0.2            </span></span><br><span class="line">Router(config-subif)<span class="comment">#encapsulation dot1q 20</span></span><br><span class="line">Router(config-subif)<span class="comment">#ip add 192.168.2.1 255.255.255.0</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801010027.png" alt=""></p>
-<p>SW：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#vlan 10,20</span></span><br><span class="line">Switch(config-vlan)<span class="comment">#exit</span></span><br><span class="line">Switch(config)<span class="comment">#int e0/0  </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport trunk encapsulation dot1q</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 00:47:44.484: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk               </span></span><br><span class="line">*Aug  1 00:47:47.496: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br><span class="line">Switch(config-if)<span class="comment">#int e0/1             </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 10</span></span><br><span class="line">Switch(config-if)<span class="comment">#int e0/2</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 20</span></span><br></pre></td></tr></table></figure>
-
-<p>PC3:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; dhcp -d</span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Discover</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:03</span><br><span class="line"></span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Discover</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:03</span><br><span class="line"></span><br><span class="line">Opcode: 2 (REPLY)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 192.168.1.2</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Offer</span><br><span class="line">Option 54: DHCP Server = 192.168.1.1</span><br><span class="line">Option 51: Lease Time = 172800</span><br><span class="line">Option 58: Renewal Time = 86400</span><br><span class="line">Option 59: Rebinding Time = 151200</span><br><span class="line">Option 1: Subnet Mask = 255.255.255.0</span><br><span class="line">Option 3: Router = 192.168.1.1</span><br><span class="line">Option 6: DNS Server = 202.106.0.20 202.106.148.1 </span><br><span class="line"></span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 192.168.1.2</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Request</span><br><span class="line">Option 54: DHCP Server = 192.168.1.1</span><br><span class="line">Option 50: Requested IP Address = 192.168.1.2</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:03</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line"></span><br><span class="line">Opcode: 2 (REPLY)</span><br><span class="line">Client IP Address: 192.168.1.2</span><br><span class="line">Your IP Address: 192.168.1.2</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Ack</span><br><span class="line">Option 54: DHCP Server = 192.168.1.1</span><br><span class="line">Option 51: Lease Time = 172800</span><br><span class="line">Option 58: Renewal Time = 86400</span><br><span class="line">Option 59: Rebinding Time = 151200</span><br><span class="line">Option 1: Subnet Mask = 255.255.255.0</span><br><span class="line">Option 3: Router = 192.168.1.1</span><br><span class="line">Option 6: DNS Server = 202.106.0.20 202.106.148.1 </span><br><span class="line"></span><br><span class="line"> IP 192.168.1.2/24 GW 192.168.1.1</span><br></pre></td></tr></table></figure>
-
-<p>PC4:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; dhcp -d</span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Discover</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:04</span><br><span class="line"></span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Discover</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:04</span><br><span class="line"></span><br><span class="line">Opcode: 2 (REPLY)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 192.168.2.2</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Offer</span><br><span class="line">Option 54: DHCP Server = 192.168.2.1</span><br><span class="line">Option 51: Lease Time = 172800</span><br><span class="line">Option 58: Renewal Time = 86400</span><br><span class="line">Option 59: Rebinding Time = 151200</span><br><span class="line">Option 1: Subnet Mask = 255.255.255.0</span><br><span class="line">Option 3: Router = 192.168.2.1</span><br><span class="line">Option 6: DNS Server = 202.106.0.20 202.106.148.1 </span><br><span class="line"></span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 192.168.2.2</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Request</span><br><span class="line">Option 54: DHCP Server = 192.168.2.1</span><br><span class="line">Option 50: Requested IP Address = 192.168.2.2</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:04</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line"></span><br><span class="line">Opcode: 2 (REPLY)</span><br><span class="line">Client IP Address: 192.168.2.2</span><br><span class="line">Your IP Address: 192.168.2.2</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Ack</span><br><span class="line">Option 54: DHCP Server = 192.168.2.1</span><br><span class="line">Option 51: Lease Time = 172800</span><br><span class="line">Option 58: Renewal Time = 86400</span><br><span class="line">Option 59: Rebinding Time = 151200</span><br><span class="line">Option 1: Subnet Mask = 255.255.255.0</span><br><span class="line">Option 3: Router = 192.168.2.1</span><br><span class="line">Option 6: DNS Server = 202.106.0.20 202.106.148.1 </span><br><span class="line"></span><br><span class="line"> IP 192.168.2.2/24 GW 192.168.2.1</span><br></pre></td></tr></table></figure>
-
-<p>从PC3 Ping到PC4</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801013009.png" alt=""></p>
-<h2 id="实验总结：-1"><a href="#实验总结：-1" class="headerlink" title="实验总结："></a>实验总结：</h2><p>通过DHCP可以自动帮助我们分配大量设备的IP地址，简化我们的工作流程，解放我们的双手，也可以通过命令指定保留的ip，其他配置与单臂路由相似。</p>
-<hr>
-<h2 id="实验名称-三层交换机的使用"><a href="#实验名称-三层交换机的使用" class="headerlink" title="实验名称:三层交换机的使用"></a>实验名称:三层交换机的使用</h2><h2 id="实验拓扑：-2"><a href="#实验拓扑：-2" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801095956.png" alt=""></p>
-<h2 id="实验要求："><a href="#实验要求：" class="headerlink" title="实验要求："></a>实验要求：</h2><p>按照图中规划配置实现VLAN间互通，配置路由器实现内网访问路由器。</p>
-<h2 id="实验思路："><a href="#实验思路：" class="headerlink" title="实验思路："></a>实验思路：</h2><p>配置好如图所示的各各PC以及路由器端口交换机端口的IP，然后SW2与SW1之间通过trunk连接，在三层交换机（SW1）上配置VLAN接口为虚接口，并启动路由功能。</p>
-<h2 id="实验步骤：-2"><a href="#实验步骤：-2" class="headerlink" title="实验步骤："></a>实验步骤：</h2><p>R6:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Router(config)<span class="comment">#int e0/0</span></span><br><span class="line">Router(config-if)<span class="comment">#ip add 10.1.1.2 255.255.255.252</span></span><br><span class="line">Router(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">*Aug  1 09:53:15.457: %LINK-3-UPDOWN: Interface Ethernet0/0, changed state to up</span><br><span class="line">*Aug  1 09:53:16.462: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br><span class="line">Router(config)<span class="comment">#ip route 192.168.1.0 255.255.255.0 10.1.1.1</span></span><br><span class="line">Router(config)<span class="comment">#ip route 192.168.2.0 255.255.255.0 10.1.1.1</span></span><br><span class="line">Router(config)<span class="comment">#ip route 192.168.3.0 255.255.255.0 10.1.1.1</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801102940.png" alt=""></p>
-<p>SW1:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#hostname 3L-SW2 		//修改交换机名称</span></span><br><span class="line">3L-SW2(config)<span class="comment">#no ip cef</span></span><br><span class="line">3L-SW2(config)<span class="comment">#int e0/0     </span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#switchport trunk encapsulation dot1q</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#switchport mode trunk</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 09:57:13.410: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to down</span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 09:57:14.523: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip routing		//开启三层路由功能</span></span><br><span class="line">3L-SW2(config-vlan)<span class="comment">#exit</span></span><br><span class="line">3L-SW2(config)<span class="comment">#int e0/1</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#no switchport		</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 09:58:40.157: %LINK-3-UPDOWN: Interface Ethernet0/1, changed state to up</span><br><span class="line">*Aug  1 09:58:41.165: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/1, changed state to up</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip address 10.1.1.1 255.255.255.252	//设置e0/1端口的ip</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip router 0.0.0.0 0.0.0.0 10.1.1.2	</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#exit                               </span></span><br><span class="line">3L-SW2(config)<span class="comment">#ip route 0.0.0.0 0.0.0.0 10.1.1.2	//配置缺省路由</span></span><br><span class="line">3L-SW2(config)<span class="comment">#vlan 10,20,30</span></span><br><span class="line">3L-SW2(config)<span class="comment">#int vlan 10		//配置虚拟接口的IP</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 10:03:26.478: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan10, changed state to down</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip add 192.168.1.1 255.255.255.0	</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 10:03:48.492: %LINK-3-UPDOWN: Interface Vlan10, changed state to up</span><br><span class="line">*Aug  1 10:03:49.494: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan10, changed state to up</span><br><span class="line">3L-SW2(config-if)<span class="comment">#int vlan 20</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#  </span></span><br><span class="line">*Aug  1 10:03:54.187: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan20, changed state to down</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip add 192.168.2.1 255.255.255.0   </span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#no shutdown     </span></span><br><span class="line">*Aug  1 10:05:10.848: %LINK-3-UPDOWN: Interface Vlan20, changed state to up</span><br><span class="line">*Aug  1 10:05:11.855: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan20, changed state to up</span><br><span class="line">3L-SW2(config-if)<span class="comment">#int vlan 30</span></span><br><span class="line">3L-SW2(config-if)<span class="comment"># </span></span><br><span class="line">*Aug  1 10:05:14.091: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan30, changed state to down</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip add 192.168.3.1 255.255.255.0</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 10:05:33.624: %LINK-3-UPDOWN: Interface Vlan30, changed state to up</span><br><span class="line">*Aug  1 10:05:34.630: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan30, changed state to up</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801102751.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801102846.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805194508.png" alt=""></p>
 <p>SW2:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#vlan 10,20,30</span></span><br><span class="line">Switch(config)<span class="comment">#int e0/1 </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 30</span></span><br><span class="line">Switch(config-vlan)<span class="comment">#int e0/2</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 10</span></span><br><span class="line">Switch(config-if)<span class="comment">#int e0/3</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 20</span></span><br><span class="line">Switch(config-if)<span class="comment">#int e0/0</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport trunk encapsulation dot1q</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#vlan 11,10,12</span></span><br><span class="line">Switch(config-vlan)<span class="comment">#exit</span></span><br><span class="line">Switch(config)<span class="comment">#spanning-tree vlan 11,10 root secondary </span></span><br><span class="line">Switch(config)<span class="comment">#spanning-tree vlan 12 root primary </span></span><br><span class="line">Switch(config)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:15:56.822: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to down</span><br><span class="line">*Aug  5 16:15:57.830: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br><span class="line">Switch(config)<span class="comment">#int range  e0/0-2 </span></span><br><span class="line">Switch(config-if-range)<span class="comment">#switchport trunk en dot1q</span></span><br><span class="line">Switch(config-if-range)<span class="comment">#switchport mode trunk</span></span><br><span class="line">Switch(config-if-range)<span class="comment">#exit</span></span><br><span class="line">Switch(config)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:18:45.496: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/1, changed state to down</span><br><span class="line">Switch(config)<span class="comment">#</span></span><br><span class="line">*Aug  5 16:18:48.513: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/1, changed state to up</span><br><span class="line">Switch(config)<span class="comment">#int e0/1</span></span><br><span class="line">Switch(config-if)<span class="comment">#no switchport mode trunk</span></span><br><span class="line">Switch(config-if)<span class="comment">#no switchport trunk en dot1q</span></span><br><span class="line">Switch(config-if)<span class="comment">#exit</span></span><br></pre></td></tr></table></figure>
 
-<p>PC3:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.1.156 192.168.1.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.1.156 255.255.255.0 gateway 192.168.1.1</span><br></pre></td></tr></table></figure>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805194555.png" alt=""></p>
+<p>SW3:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#int range e0/1-2</span></span><br><span class="line">Switch(config-if-range)<span class="comment">#switchport trunk en dot1q</span></span><br><span class="line">Switch(config-if-range)<span class="comment">#switchport mode trunk</span></span><br><span class="line">Switch(config-if-range)<span class="comment">#exit</span></span><br><span class="line">Switch(config-if)<span class="comment">#vlan 10,11,12</span></span><br><span class="line">Switch(config-vlan)<span class="comment">#int e1/1                                          </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 10</span></span><br><span class="line">Switch(config-if)<span class="comment">#int e1/2</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 11</span></span><br><span class="line">Switch(config-if)<span class="comment">#no vlan 20</span></span><br><span class="line">Switch(config)<span class="comment">#int e1/3</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 12</span></span><br><span class="line">Switch(config-if)<span class="comment">#exit</span></span><br><span class="line">Switch(config)<span class="comment">#do show spanning-tree</span></span><br></pre></td></tr></table></figure>
 
-<p>PC4:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.3.156 192.168.3.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.3.156 255.255.255.0 gateway 192.168.3.1</span><br></pre></td></tr></table></figure>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805194628.png" alt=""></p>
+<p>VPC4:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.12.2 192.168.12.1</span><br></pre></td></tr></table></figure>
 
-<p>PC5:</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.2.156 192.168.2.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.2.156 255.255.255.0 gateway 192.168.2.1</span><br></pre></td></tr></table></figure>
+<p>VPC5:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.11.2 192.168.11.1</span><br></pre></td></tr></table></figure>
 
-<p>然后用PC Ping R6，Ping通实验成功。</p>
-<h2 id="实验总结：-2"><a href="#实验总结：-2" class="headerlink" title="实验总结："></a>实验总结：</h2><p>单臂路由可以实现不同VLAN间的通信，但是由于单臂路由的三个缺陷，即“单臂”为网络骨干链路，容易形成网络瓶颈。和子接口依然依托于物理接口，应用不灵活。以及VLAN间转发需要查看路由表，严重浪费设备资源。所以就出现了三层交换技术，使用三层交换急速实现VLAN之间的通信，三层交换设备基于CEF的MLS关键在于两张表，一张表是转发信息库（FIB）一张是邻接关系表。</p>
+<p>VPC6:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.10.2 192.168.10.1</span><br></pre></td></tr></table></figure>
+
+<p>VPC7:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.11.2 192.168.11.1</span><br></pre></td></tr></table></figure>
+
+<p>VPC8:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.11.3 192.168.11.1</span><br></pre></td></tr></table></figure>
+
+<p>VPC9:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.12.3 192.168.12.1</span><br></pre></td></tr></table></figure>
+
+<p>Ping效果图：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805225358.png" alt=""></p>
+<p>故意关闭SW3的e0/2端口，模拟线路发生故障。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#int e0/2</span></span><br><span class="line">Switch(config-if)<span class="comment">#shutdown</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  5 17:53:32.515: %LINK-5-CHANGED: Interface Ethernet0/2, changed state to administratively down</span><br><span class="line">*Aug  5 17:53:33.515: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/2, changed state to down</span><br></pre></td></tr></table></figure>
+
+<p>对比两张表，前者是关闭之前的，后者是关闭之后的。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805230615.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805230703.png" alt=""></p>
+<p>对比发现e0/2接口被关闭后，e0/1接口由block变为forward状态</p>
+<p>再次回到Pc9检查链路联通性。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805231317.png" alt=""></p>
+<p>实验完成。</p>
+<h2 id="实验总结："><a href="#实验总结：" class="headerlink" title="实验总结："></a>实验总结：</h2><p>当线路出现故障，断开的接口被激活，恢复通信，起备份线路的作用，STP的作用是通过阻断冗余链路，使一个有回路的桥接网络修剪成一个无回路的树形拓扑结构。</p>
+<p>主要配置命令：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805232054.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805232104.png" alt=""></p>
 ]]></content>
       <categories>
         <category>网络</category>
       </categories>
       <tags>
-        <tag>单臂路由</tag>
-        <tag>DHCP</tag>
-        <tag>三层交换设备</tag>
+        <tag>Stp</tag>
+        <tag>Vlan</tag>
+        <tag>Trunk</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vsftpd服务</title>
+    <url>/2020/08/05/vsftpd%E6%9C%8D%E5%8A%A1/</url>
+    <content><![CDATA[<h2 id="vsftpd服务"><a href="#vsftpd服务" class="headerlink" title="vsftpd服务"></a>vsftpd服务</h2><p>关闭防火墙</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># service iptables stop</span></span><br><span class="line">iptables: Setting chains to policy ACCEPT: filter          [  OK  ]</span><br><span class="line">iptables: Flushing firewall rules:                         [  OK  ]</span><br><span class="line">iptables: Unloading modules:                               [  OK  ]</span><br><span class="line">[root@localhost ~]<span class="comment"># setenforce 0</span></span><br></pre></td></tr></table></figure>
+
+<p>安装vsftpd服务</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y vsftpd</span></span><br></pre></td></tr></table></figure>
+
+<p>配置vsftpd开启匿名访问</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line">anonymous_enable=YES			//允许匿名登录（默认开启）</span><br><span class="line">anon_upload_enable=YES			//允许匿名上传</span><br><span class="line">anon_mkdir_write_enable=YES		//允许匿名创建文件夹，但是不能删除</span><br><span class="line">anon_other_write_enable=YES		//允许匿名创建和删除</span><br><span class="line">[root@localhost ~]<span class="comment"># service vsftpd start</span></span><br><span class="line">Starting vsftpd <span class="keyword">for</span> vsftpd:                                [  OK  ]</span><br></pre></td></tr></table></figure>
+
+<p>设置匿名用户默认访问路径的权限</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># chmod 757 /var/ftp/pub</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ll /var/ftp</span></span><br><span class="line">total 4</span><br><span class="line">drwxr-xrwx. 2 root root 4096 Mar  1  2013 pub</span><br></pre></td></tr></table></figure>
+
+<p>Win10测试创建文件：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805160835.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805160915.png" alt=""></p>
+<h2 id="虚拟用户访问"><a href="#虚拟用户访问" class="headerlink" title="虚拟用户访问"></a>虚拟用户访问</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/yum.repos.d/dd.repo</span></span><br><span class="line">	enabled=0		//禁用本地源，更改为网络源。</span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y  db* pam*</span></span><br></pre></td></tr></table></figure>
+
+<p>配置虚拟用户</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /etc/vsftpd</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim /etc/vsftpd/ftpusers.txt	//奇数行为用户名，偶数行为密码</span></span><br><span class="line">tangxiaoyan		</span><br><span class="line">123</span><br><span class="line">yanxiaotang</span><br><span class="line">321</span><br><span class="line"></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># db_load -T -t hash -f ftpusers.txt ftpuser.db</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim /etc/pam.d/vsftpd</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># useradd -d /home/ftpusers -s /bin/nologin ftpusers</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line"></span><br><span class="line">ascii_upload_enable=YES</span><br><span class="line">ascii_download_enable=YES</span><br><span class="line">guest_enable=YES</span><br><span class="line">guest_username=ftpusers</span><br><span class="line">user_config_dir=/etc/vsftpd/vsftpd_user_conf</span><br><span class="line">virtual_use_local_privs=YES</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># service vsftpd restart</span></span><br><span class="line">Shutting down vsftpd:                                      [  OK  ]</span><br><span class="line">Starting vsftpd <span class="keyword">for</span> vsftpd:                                [  OK  ]</span><br></pre></td></tr></table></figure>
+
+<p>windows验证：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175137.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175155.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175221.png" alt=""></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost vsftpd]<span class="comment"># mkdir vsftpd_user_conf</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim vsftpd_user_conf/tom</span></span><br><span class="line">local_root=/opt/kl</span><br><span class="line">[root@localhost vsftpd]<span class="comment"># mkdir /opt/kl</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># chmod 777 /opt/kl</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># service vsftpd restart</span></span><br><span class="line">Shutting down vsftpd:                                      [  OK  ]</span><br><span class="line">Starting vsftpd <span class="keyword">for</span> vsftpd:                                [  OK  ]</span><br></pre></td></tr></table></figure>
+
+<p>windows登录tom用户然后创建文件夹</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175655.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175531.png" alt=""></p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>vsftpd</tag>
       </tags>
   </entry>
   <entry>
@@ -639,6 +568,275 @@
       </tags>
   </entry>
   <entry>
+    <title>OSPF</title>
+    <url>/2020/07/23/OSPF/</url>
+    <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/1345.jpg" alt=""></p>
+<p>通过OSPF使全网互通。</p>
+<a id="more"></a>
+
+<p>实验拓扑：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723103018.png" alt=""></p>
+<p>目的：使用OSPF协议使R4与R5互通。</p>
+<p>R4：<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723102307.png" alt=""></p>
+<p>R2：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723103046.png" alt=""></p>
+<p>R1：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723111321.png" alt=""></p>
+<p>R3：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723110558.png" alt=""></p>
+<p>R1：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723112036.png" alt=""></p>
+<p>R5：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/image-20200723112809309.png" alt=""></p>
+<p>Ping:</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200723112921.png" alt=""></p>
+]]></content>
+      <categories>
+        <category>网络</category>
+      </categories>
+      <tags>
+        <tag>OSPF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>单臂路由</title>
+    <url>/2020/08/01/%E5%8D%95%E8%87%82%E8%B7%AF%E7%94%B1/</url>
+    <content><![CDATA[<h2 id="实验名称：单臂路由实现不同VLAN间通信"><a href="#实验名称：单臂路由实现不同VLAN间通信" class="headerlink" title="实验名称：单臂路由实现不同VLAN间通信"></a>实验名称：单臂路由实现不同VLAN间通信</h2><h2 id="实验拓扑："><a href="#实验拓扑：" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200731231440.png" alt=""></p>
+<a id="more"></a>
+
+<h2 id="实验需求："><a href="#实验需求：" class="headerlink" title="实验需求："></a>实验需求：</h2><p>通过单臂路由实现VLAN10与VLAN20通信</p>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="center">PC3</th>
+<th align="center">PC4</th>
+<th align="center">R1的e0/0.1</th>
+<th align="center">R1的e0/0.2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">IP地址</td>
+<td align="center">10.0.0.10/24</td>
+<td align="center">20.0.0.20/24</td>
+<td align="center">10.0.0.1/24</td>
+<td align="center">20.0.0.1/24</td>
+</tr>
+</tbody></table>
+<h2 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h2><p>R1与SW之间配置Trunk链路，PC与SW之间配置access链路，路由器配置虚拟接口，然后实现VLAN10与VLAN20通信也就是PC3可以ping通PC4。</p>
+<h2 id="实验步骤："><a href="#实验步骤：" class="headerlink" title="实验步骤："></a>实验步骤：</h2><p>R1:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Router(config)<span class="comment">#int e0/0		</span></span><br><span class="line">Router(config)<span class="comment">#no shudown		//必须开启物理接口</span></span><br><span class="line">Router(config)<span class="comment">#int e0/0.1		//进入子接口</span></span><br><span class="line">Router(config-subif)<span class="comment">#encapsulation dot1q 10		//首先配置子接口对应的VLAN</span></span><br><span class="line">Router(config-subif)<span class="comment">#ip add 10.0.0.1 255.255.255.0	//再配置子接口的IP地址</span></span><br><span class="line">Router(config-subif)<span class="comment">#no shutdown	//开启接口</span></span><br><span class="line">Router(config-subif)<span class="comment">#int e0/0.2</span></span><br><span class="line">Router(config-subif)<span class="comment">#encapsulation dot1q 20</span></span><br><span class="line">Router(config-subif)<span class="comment">#ip add 20.0.0.1 255.255.255.0</span></span><br><span class="line">Router(config-subif)<span class="comment">#no shutdown</span></span><br></pre></td></tr></table></figure>
+
+<p>查看端口状态：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200731235334.png" alt=""></p>
+<p>SW:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#int e0/1</span></span><br><span class="line">Switch(config-if)<span class="comment">#switch</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 10</span></span><br><span class="line">Switch(config-if)<span class="comment">#exit</span></span><br><span class="line">Switch(config)<span class="comment">#int e0/2</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 20</span></span><br><span class="line">Switch(config-if)<span class="comment">#exit</span></span><br><span class="line">Switch(config)<span class="comment">#int e0/0</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport trunk encapsulation dot1q </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Jul 31 23:19:08.365: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Jul 31 23:19:11.371: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br></pre></td></tr></table></figure>
+
+<p>PC3:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 10.0.0.10 10.0.0.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 10.0.0.10 255.255.255.0 gateway 10.0.0.1</span><br></pre></td></tr></table></figure>
+
+<p>PC4:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 20.0.0.20 20.0.0.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 20.0.0.20 255.255.255.0 gateway 20.0.0.1</span><br></pre></td></tr></table></figure>
+
+<p>查看R1的路由表：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200731235503.png" alt=""></p>
+<p>从Pc3 Ping通 Pc4</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200731235728.png" alt=""></p>
+<h2 id="实验总结："><a href="#实验总结：" class="headerlink" title="实验总结："></a>实验总结：</h2><p>开启子接口的前提是开启物理接口，子接口要先配置对应的VLAN再配置IP地址，交换机连接主机的端口使用access链路，交换机连接路由器的端口为trunk链路，通过单臂路由可以实现交换机不同VLAN直接的通信。</p>
+<hr>
+<h2 id="实验名称-配置DHCP服务"><a href="#实验名称-配置DHCP服务" class="headerlink" title="实验名称:配置DHCP服务"></a>实验名称:配置DHCP服务</h2><h2 id="实验拓扑：-1"><a href="#实验拓扑：-1" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801000423.png" alt=""></p>
+<h2 id="实验需求：-1"><a href="#实验需求：-1" class="headerlink" title="实验需求："></a>实验需求：</h2><p>通过DHCP自动为PC3,PC4分配IP地址，并预留两台打印机的IP地址。</p>
+<p>设置Vlan10和Vlan20的地址池分别为192.168.1.0/24与192.168.2.0/24</p>
+<p>分别预留192.168.1.100和192.168.1.33</p>
+<p>DHCP地址池范围为192.168.1.0</p>
+<p>为客户端配置DNS地址为202.106.0.20以及202.106.148.1</p>
+<p>IP地址的租期为2天</p>
+<h2 id="解题思路：-1"><a href="#解题思路：-1" class="headerlink" title="解题思路："></a>解题思路：</h2><h2 id="实验步骤：-1"><a href="#实验步骤：-1" class="headerlink" title="实验步骤："></a>实验步骤：</h2><p>R1：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Router(config)<span class="comment">#ip dhcp pool VLAN 10		//配置VLAN10的地址池</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#network 192.168.1.0 255.255.255.0    //指定地址池的范围</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#default-router 192.168.1.1		//指定网关</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#dns-server 202.106.0.20 202.106.148.1	//指定DNS</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#lease 2		//指定DHCP使用天数</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#exit	</span></span><br><span class="line">Router(config)<span class="comment">#ip dhcp excluded-address 192.168.1.100	//设置DHCP保留地址</span></span><br><span class="line">Router(config)<span class="comment">#ip dhcp excluded-address 192.168.1.33 </span></span><br><span class="line">Router(config)<span class="comment">#ip dhcp pool VLAN 20</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#network 192.168.2.0 255.255.255.0</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#default-router 192.168.2.1</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#dns-server 202.106.0.20 202.106.148.1</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#lease 2</span></span><br><span class="line">Router(dhcp-config)<span class="comment">#int e0/0</span></span><br><span class="line">Router(config-if)<span class="comment">#no shutdow</span></span><br><span class="line">Router(config-if)<span class="comment">#int e0/0.1</span></span><br><span class="line">Router(config-subif)<span class="comment">#encapsulation dot1q 10</span></span><br><span class="line">Router(config-subif)<span class="comment">#ip add 192.168.1.1 255.255.255.0</span></span><br><span class="line">Router(config-subif)<span class="comment">#int e0/0.2            </span></span><br><span class="line">Router(config-subif)<span class="comment">#encapsulation dot1q 20</span></span><br><span class="line">Router(config-subif)<span class="comment">#ip add 192.168.2.1 255.255.255.0</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801010027.png" alt=""></p>
+<p>SW：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#vlan 10,20</span></span><br><span class="line">Switch(config-vlan)<span class="comment">#exit</span></span><br><span class="line">Switch(config)<span class="comment">#int e0/0  </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport trunk encapsulation dot1q</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk</span></span><br><span class="line">Switch(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 00:47:44.484: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to down</span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk               </span></span><br><span class="line">*Aug  1 00:47:47.496: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br><span class="line">Switch(config-if)<span class="comment">#int e0/1             </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 10</span></span><br><span class="line">Switch(config-if)<span class="comment">#int e0/2</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 20</span></span><br></pre></td></tr></table></figure>
+
+<p>PC3:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; dhcp -d</span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Discover</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:03</span><br><span class="line"></span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Discover</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:03</span><br><span class="line"></span><br><span class="line">Opcode: 2 (REPLY)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 192.168.1.2</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Offer</span><br><span class="line">Option 54: DHCP Server = 192.168.1.1</span><br><span class="line">Option 51: Lease Time = 172800</span><br><span class="line">Option 58: Renewal Time = 86400</span><br><span class="line">Option 59: Rebinding Time = 151200</span><br><span class="line">Option 1: Subnet Mask = 255.255.255.0</span><br><span class="line">Option 3: Router = 192.168.1.1</span><br><span class="line">Option 6: DNS Server = 202.106.0.20 202.106.148.1 </span><br><span class="line"></span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 192.168.1.2</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Request</span><br><span class="line">Option 54: DHCP Server = 192.168.1.1</span><br><span class="line">Option 50: Requested IP Address = 192.168.1.2</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:03</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line"></span><br><span class="line">Opcode: 2 (REPLY)</span><br><span class="line">Client IP Address: 192.168.1.2</span><br><span class="line">Your IP Address: 192.168.1.2</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:03</span><br><span class="line">Option 53: Message Type = Ack</span><br><span class="line">Option 54: DHCP Server = 192.168.1.1</span><br><span class="line">Option 51: Lease Time = 172800</span><br><span class="line">Option 58: Renewal Time = 86400</span><br><span class="line">Option 59: Rebinding Time = 151200</span><br><span class="line">Option 1: Subnet Mask = 255.255.255.0</span><br><span class="line">Option 3: Router = 192.168.1.1</span><br><span class="line">Option 6: DNS Server = 202.106.0.20 202.106.148.1 </span><br><span class="line"></span><br><span class="line"> IP 192.168.1.2/24 GW 192.168.1.1</span><br></pre></td></tr></table></figure>
+
+<p>PC4:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; dhcp -d</span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Discover</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:04</span><br><span class="line"></span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Discover</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:04</span><br><span class="line"></span><br><span class="line">Opcode: 2 (REPLY)</span><br><span class="line">Client IP Address: 0.0.0.0</span><br><span class="line">Your IP Address: 192.168.2.2</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Offer</span><br><span class="line">Option 54: DHCP Server = 192.168.2.1</span><br><span class="line">Option 51: Lease Time = 172800</span><br><span class="line">Option 58: Renewal Time = 86400</span><br><span class="line">Option 59: Rebinding Time = 151200</span><br><span class="line">Option 1: Subnet Mask = 255.255.255.0</span><br><span class="line">Option 3: Router = 192.168.2.1</span><br><span class="line">Option 6: DNS Server = 202.106.0.20 202.106.148.1 </span><br><span class="line"></span><br><span class="line">Opcode: 1 (REQUEST)</span><br><span class="line">Client IP Address: 192.168.2.2</span><br><span class="line">Your IP Address: 0.0.0.0</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Request</span><br><span class="line">Option 54: DHCP Server = 192.168.2.1</span><br><span class="line">Option 50: Requested IP Address = 192.168.2.2</span><br><span class="line">Option 61: Client Identifier = Hardware Type=Ethernet MAC Address = 00:50:79:66:68:04</span><br><span class="line">Option 12: Host Name = VPCS1</span><br><span class="line"></span><br><span class="line">Opcode: 2 (REPLY)</span><br><span class="line">Client IP Address: 192.168.2.2</span><br><span class="line">Your IP Address: 192.168.2.2</span><br><span class="line">Server IP Address: 0.0.0.0</span><br><span class="line">Gateway IP Address: 0.0.0.0</span><br><span class="line">Client MAC Address: 00:50:79:66:68:04</span><br><span class="line">Option 53: Message Type = Ack</span><br><span class="line">Option 54: DHCP Server = 192.168.2.1</span><br><span class="line">Option 51: Lease Time = 172800</span><br><span class="line">Option 58: Renewal Time = 86400</span><br><span class="line">Option 59: Rebinding Time = 151200</span><br><span class="line">Option 1: Subnet Mask = 255.255.255.0</span><br><span class="line">Option 3: Router = 192.168.2.1</span><br><span class="line">Option 6: DNS Server = 202.106.0.20 202.106.148.1 </span><br><span class="line"></span><br><span class="line"> IP 192.168.2.2/24 GW 192.168.2.1</span><br></pre></td></tr></table></figure>
+
+<p>从PC3 Ping到PC4</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801013009.png" alt=""></p>
+<h2 id="实验总结：-1"><a href="#实验总结：-1" class="headerlink" title="实验总结："></a>实验总结：</h2><p>通过DHCP可以自动帮助我们分配大量设备的IP地址，简化我们的工作流程，解放我们的双手，也可以通过命令指定保留的ip，其他配置与单臂路由相似。</p>
+<hr>
+<h2 id="实验名称-三层交换机的使用"><a href="#实验名称-三层交换机的使用" class="headerlink" title="实验名称:三层交换机的使用"></a>实验名称:三层交换机的使用</h2><h2 id="实验拓扑：-2"><a href="#实验拓扑：-2" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801095956.png" alt=""></p>
+<h2 id="实验要求："><a href="#实验要求：" class="headerlink" title="实验要求："></a>实验要求：</h2><p>按照图中规划配置实现VLAN间互通，配置路由器实现内网访问路由器。</p>
+<h2 id="实验思路："><a href="#实验思路：" class="headerlink" title="实验思路："></a>实验思路：</h2><p>配置好如图所示的各各PC以及路由器端口交换机端口的IP，然后SW2与SW1之间通过trunk连接，在三层交换机（SW1）上配置VLAN接口为虚接口，并启动路由功能。</p>
+<h2 id="实验步骤：-2"><a href="#实验步骤：-2" class="headerlink" title="实验步骤："></a>实验步骤：</h2><p>R6:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Router(config)<span class="comment">#int e0/0</span></span><br><span class="line">Router(config-if)<span class="comment">#ip add 10.1.1.2 255.255.255.252</span></span><br><span class="line">Router(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">*Aug  1 09:53:15.457: %LINK-3-UPDOWN: Interface Ethernet0/0, changed state to up</span><br><span class="line">*Aug  1 09:53:16.462: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br><span class="line">Router(config)<span class="comment">#ip route 192.168.1.0 255.255.255.0 10.1.1.1</span></span><br><span class="line">Router(config)<span class="comment">#ip route 192.168.2.0 255.255.255.0 10.1.1.1</span></span><br><span class="line">Router(config)<span class="comment">#ip route 192.168.3.0 255.255.255.0 10.1.1.1</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801102940.png" alt=""></p>
+<p>SW1:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#hostname 3L-SW2 		//修改交换机名称</span></span><br><span class="line">3L-SW2(config)<span class="comment">#no ip cef</span></span><br><span class="line">3L-SW2(config)<span class="comment">#int e0/0     </span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#switchport trunk encapsulation dot1q</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#switchport mode trunk</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 09:57:13.410: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to down</span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 09:57:14.523: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip routing		//开启三层路由功能</span></span><br><span class="line">3L-SW2(config-vlan)<span class="comment">#exit</span></span><br><span class="line">3L-SW2(config)<span class="comment">#int e0/1</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#no switchport		</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 09:58:40.157: %LINK-3-UPDOWN: Interface Ethernet0/1, changed state to up</span><br><span class="line">*Aug  1 09:58:41.165: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/1, changed state to up</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip address 10.1.1.1 255.255.255.252	//设置e0/1端口的ip</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip router 0.0.0.0 0.0.0.0 10.1.1.2	</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#exit                               </span></span><br><span class="line">3L-SW2(config)<span class="comment">#ip route 0.0.0.0 0.0.0.0 10.1.1.2	//配置缺省路由</span></span><br><span class="line">3L-SW2(config)<span class="comment">#vlan 10,20,30</span></span><br><span class="line">3L-SW2(config)<span class="comment">#int vlan 10		//配置虚拟接口的IP</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 10:03:26.478: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan10, changed state to down</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip add 192.168.1.1 255.255.255.0	</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 10:03:48.492: %LINK-3-UPDOWN: Interface Vlan10, changed state to up</span><br><span class="line">*Aug  1 10:03:49.494: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan10, changed state to up</span><br><span class="line">3L-SW2(config-if)<span class="comment">#int vlan 20</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#  </span></span><br><span class="line">*Aug  1 10:03:54.187: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan20, changed state to down</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip add 192.168.2.1 255.255.255.0   </span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#no shutdown     </span></span><br><span class="line">*Aug  1 10:05:10.848: %LINK-3-UPDOWN: Interface Vlan20, changed state to up</span><br><span class="line">*Aug  1 10:05:11.855: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan20, changed state to up</span><br><span class="line">3L-SW2(config-if)<span class="comment">#int vlan 30</span></span><br><span class="line">3L-SW2(config-if)<span class="comment"># </span></span><br><span class="line">*Aug  1 10:05:14.091: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan30, changed state to down</span><br><span class="line">3L-SW2(config-if)<span class="comment">#ip add 192.168.3.1 255.255.255.0</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">3L-SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug  1 10:05:33.624: %LINK-3-UPDOWN: Interface Vlan30, changed state to up</span><br><span class="line">*Aug  1 10:05:34.630: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan30, changed state to up</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801102751.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200801102846.png" alt=""></p>
+<p>SW2:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Switch(config)<span class="comment">#vlan 10,20,30</span></span><br><span class="line">Switch(config)<span class="comment">#int e0/1 </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 30</span></span><br><span class="line">Switch(config-vlan)<span class="comment">#int e0/2</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 10</span></span><br><span class="line">Switch(config-if)<span class="comment">#int e0/3</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode access </span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport access vlan 20</span></span><br><span class="line">Switch(config-if)<span class="comment">#int e0/0</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport trunk encapsulation dot1q</span></span><br><span class="line">Switch(config-if)<span class="comment">#switchport mode trunk</span></span><br></pre></td></tr></table></figure>
+
+<p>PC3:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.1.156 192.168.1.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.1.156 255.255.255.0 gateway 192.168.1.1</span><br></pre></td></tr></table></figure>
+
+<p>PC4:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.3.156 192.168.3.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.3.156 255.255.255.0 gateway 192.168.3.1</span><br></pre></td></tr></table></figure>
+
+<p>PC5:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VPCS&gt; ip 192.168.2.156 192.168.2.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.2.156 255.255.255.0 gateway 192.168.2.1</span><br></pre></td></tr></table></figure>
+
+<p>然后用PC Ping R6，Ping通实验成功。</p>
+<h2 id="实验总结：-2"><a href="#实验总结：-2" class="headerlink" title="实验总结："></a>实验总结：</h2><p>单臂路由可以实现不同VLAN间的通信，但是由于单臂路由的三个缺陷，即“单臂”为网络骨干链路，容易形成网络瓶颈。和子接口依然依托于物理接口，应用不灵活。以及VLAN间转发需要查看路由表，严重浪费设备资源。所以就出现了三层交换技术，使用三层交换急速实现VLAN之间的通信，三层交换设备基于CEF的MLS关键在于两张表，一张表是转发信息库（FIB）一张是邻接关系表。</p>
+]]></content>
+      <categories>
+        <category>网络</category>
+      </categories>
+      <tags>
+        <tag>单臂路由</tag>
+        <tag>DHCP</tag>
+        <tag>三层交换设备</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>我的世界Linux开服环境搭建</title>
+    <url>/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711132031.png" alt=""></p>
+<p>现在个人服务器价格以及基本进入大众可消费的水平，不是只有需要架设网站的用户才有服务器需求。我们也也可以来做很多事情，比如说搭建一个Minecraft的服务器，让我们可以很方便的与小伙伴联机，这篇主要就来通过Linux以及MCSM面板教大家搭建一个Minecraft服务器。</p>
+<p><font color=#FF0000 >喜欢或者有问题的同学，可以在下发评论留言哦！</font><a id="more"></a></p>
+<h3 id="MCSM面板搭建意义"><a href="#MCSM面板搭建意义" class="headerlink" title="MCSM面板搭建意义"></a>MCSM面板搭建意义</h3><p>1.方便管理服务器，关闭我的世界服务器以及上传和卸载插件都不用登录服务器执行命令，对新手服主非常友好。</p>
+<p>2.可以实时监控服务器状态，如剩余内存，CPU占用率等…</p>
+<h3 id="前期的准备工作"><a href="#前期的准备工作" class="headerlink" title="前期的准备工作"></a>前期的准备工作</h3><p>1.需要一台服务器，以及安装好Linux系统。    (本教程使用阿里云的学生机，系统使用CentOS7.4)</p>
+<p>2.远程SSH的控制软件。    （本教程使用 Xshell）</p>
+<p>3.我的世界服务器核心。    （本教程使用 KCauldron 1.7.10-1614）</p>
+<p>4.FTP软件,用于上传Minecratf服务器核心到服务器。    (本教程使用Xftp)</p>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>1.推荐使用CentOS系统或者RedHat系统，其他Linux系统理论也能实现，但是命令可能有细微变化，所以本教程不推荐使用。</p>
+<p>2.如果部署失败请耐心重新再次开始，大家都是这样过来的。</p>
+<p>3.本教程不适用小白，如果不会使用SSH工具、安装服务器系统，建议老老实实去淘宝买别人搭建好的。</p>
+<h3 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h3><h4 id="系统更新"><a href="#系统更新" class="headerlink" title="系统更新"></a>系统更新</h4><p>确保你的Linux系统是最新的</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum update</span><br></pre></td></tr></table></figure>
+
+<h4 id="安装node-js"><a href="#安装node-js" class="headerlink" title="安装node.js"></a>安装node.js</h4><p>1.安装<code>github</code></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install git -y</span><br></pre></td></tr></table></figure>
+
+<p>2.安装<code>node.js</code>管理器等组件</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://github.com/creationix/nvm.git ~/nvm</span><br><span class="line"><span class="comment"># 设置nvm 自动运行</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"source ~/nvm/nvm.sh"</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br><span class="line"><span class="comment"># 查询node.js的版本</span></span><br><span class="line">nvm list-remote</span><br><span class="line"><span class="comment"># 安装node.js，目前最新版本为v14.4.0</span></span><br><span class="line">nvm install v14.4.0</span><br></pre></td></tr></table></figure>
+
+<p>3.安装结束之后，请重启服务器（重要！）</p>
+<h4 id="安装Java8"><a href="#安装Java8" class="headerlink" title="安装Java8"></a>安装Java8</h4><p>使用<code>yum</code>安装<code>java8</code>安装</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装java8</span></span><br><span class="line">yum install -y java</span><br><span class="line"><span class="comment">#查看java版本</span></span><br><span class="line">java -version</span><br></pre></td></tr></table></figure>
+
+<p>没有报错，成功回显版本号则安装Java成功</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711163245.png" alt=""></p>
+<h4 id="安装MCSM"><a href="#安装MCSM" class="headerlink" title="安装MCSM"></a>安装MCSM</h4><p>克隆<strong>MCSManager</strong>并安装依赖</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 克隆目录</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/suwings/mcsmanager.git</span><br><span class="line"><span class="comment"># cd至目录</span></span><br><span class="line"><span class="built_in">cd</span> mcsmanager/</span><br><span class="line"><span class="comment"># 安装依赖库</span></span><br><span class="line">npm install</span><br><span class="line"><span class="comment"># 启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
+
+<p>启动成功效果图</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134158.png" alt=""></p>
+<h4 id="保持后台运行"><a href="#保持后台运行" class="headerlink" title="保持后台运行"></a>保持后台运行</h4><p>先<code>Ctrl+C</code>关闭面板，我们使用<code>screen</code>软件来让面板保持后台运行。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装screen</span></span><br><span class="line">yum install screen -y</span><br><span class="line"><span class="comment"># 创建一个名为 mcsm 的窗口</span></span><br><span class="line">screen -S mcsm</span><br><span class="line"><span class="comment"># 在此新终端窗口内启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
+
+<p>开启后可以直接与终端断开连接，面板讲保持后台运行。</p>
+<p><strong>若要重新控制，请输入命令即可：</strong></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">screen -r mcsm</span><br></pre></td></tr></table></figure>
+
+<h3 id="端口开放"><a href="#端口开放" class="headerlink" title="端口开放"></a>端口开放</h3><p>面板需要 23333（主功能） 端口与 20010 - 20200（FTP功能）端口区间。</p>
+<p>Minecraft需要开放25565（我的世界默认）端口号。</p>
+<p>如果你使用阿里云，腾讯云或者服务商，<strong>请进入控制台到防火墙安全组策略，放行以上端口。</strong></p>
+<h3 id="登录MCSM账户"><a href="#登录MCSM账户" class="headerlink" title="登录MCSM账户"></a>登录MCSM账户</h3><p>现在，访问 http://你的公网IP:23333/ 即可进入面板。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 开头带“#”为最高管理员权限（注意，管理员与管理员之间账号可互删）不带“#”为用户账户</span><br><span class="line">默认账号：#master</span><br><span class="line">默认密码: 123456</span><br></pre></td></tr></table></figure>
+
+<p>请及时修改密码。管理员可以互删。</p>
+<h3 id="FTP服务"><a href="#FTP服务" class="headerlink" title="FTP服务"></a>FTP服务</h3><p>需要使用FTP协议上传服务器核心到服务器上。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134440.png" alt=""></p>
+<h3 id="MCSM面板使用"><a href="#MCSM面板使用" class="headerlink" title="MCSM面板使用"></a>MCSM面板使用</h3><p>1.创建实例，这里使用快速创建</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135100.png" alt=""></p>
+<p>2.根据提示设置好参数。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135012.png" alt="[]()"></p>
+<h3 id="开启Minecraft服务器"><a href="#开启Minecraft服务器" class="headerlink" title="开启Minecraft服务器"></a>开启Minecraft服务器</h3><h4 id="EULA最终用户协议"><a href="#EULA最终用户协议" class="headerlink" title="EULA最终用户协议"></a>EULA最终用户协议</h4><p>第一次开服一定失败，返回你的<code>服务器根目录</code>,你会发现多了一个叫做eula.txt的文件，编辑它把 eula=false 改成 eula=true 就行了，这是EULA最终用户许克协议。</p>
+<p><strong>但是</strong>我希望所有服主可以看一看<code>EULA</code></p>
+<p>Minecraft EULA：<a href="https://account.mojang.com/documents/minecraft_eula" target="_blank" rel="noopener">官方汉化链接</a></p>
+<p><strong>以下两条比较重要 我更换了代词方便大家理解</strong></p>
+<ul>
+<li><p>不得将Mojang创建的任何内容用于商业用途；</p>
+</li>
+<li><p>不得试图通过Mojang创建的任何内容赚钱；</p>
+</li>
+</ul>
+<p>这意味着你几乎和开公益服没有区别，但是我们关起门来说话，违反<code>eula</code>的服务器与服主 全世界比比皆是</p>
+<p>这<strong>不代表</strong>你可以认为 你可以光明正大地开商业化服务器</p>
+<p>但在这种大环境下 我相信可怜的绝大部分人 做不到 不违反<code>eula</code></p>
+<p>所以 请你们抱着<strong>内疚，悔恨</strong>的心理 看待你开了违反<code>eula</code>的服务器这一事实</p>
+<p>刚刚气氛好沉重啊 让我们回归主题，继续把服务器开起来吧！</p>
+<h4 id="关闭正版验证"><a href="#关闭正版验证" class="headerlink" title="关闭正版验证"></a>关闭正版验证</h4><p>返回你的<code>服务器根目录</code>找到server.properties这个文件，编辑它，更改 online-mode=true 为online-mode=false</p>
+<p><strong>不关这个正版验证 如果你不是正版玩家你是进不去服务器的</strong></p>
+<p>当然，Mojang已经说过了，如果你现在买不起Minecraft，可以先玩，以后有能力了再来补票。</p>
+<p><strong>注意：</strong>正版玩家和盗版玩家是没有区别的！但我还是希望每个热爱这款游戏，有能力的玩家都可以去支持一下正版。</p>
+<p><strong>做了以上两步操作就可以通过面板开启服务器了</strong></p>
+<h3 id="进入Minecraft服务器"><a href="#进入Minecraft服务器" class="headerlink" title="进入Minecraft服务器"></a>进入Minecraft服务器</h3><p>插一嘴，我建议使用<code>HMCL</code>启动器</p>
+<p>官网链接：<a href="https://hmcl.huangyuhui.net/download" target="_blank" rel="noopener">HMCL启动器</a></p>
+<p>进入游戏之后选择多人游戏，然后添加服务器，服务器地址可以写ip或者域名。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140416.png" alt=""></p>
+<p>添加之后可以看到服务器已经开启，我们双击进入。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140441.png" alt=""></p>
+<p>好的，我们的服务器就这样开起来了，是不是觉得很简单呢。</p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Minecraft</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux配置DNS解析服务</title>
+    <url>/2020/07/29/Linux%E9%85%8D%E7%BD%AEDNS%E8%A7%A3%E6%9E%90%E6%9C%8D%E5%8A%A1/</url>
+    <content><![CDATA[<h2 id="关于Linux如何配置DNS解析"><a href="#关于Linux如何配置DNS解析" class="headerlink" title="关于Linux如何配置DNS解析"></a>关于Linux如何配置DNS解析</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/1234.jpg" alt=""></p>
+<a id="more"></a>
+
+<p>Server配置：</p>
+<p>配置好Server的ip：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># ip a</span></span><br><span class="line">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN </span><br><span class="line">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">    inet 127.0.0.1/8 scope host lo</span><br><span class="line">    inet6 ::1/128 scope host </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000</span><br><span class="line">    link/ether 00:0c:29:f6:1e:cf brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 192.168.211.150/24 brd 192.168.211.255 scope global eth0</span><br><span class="line">    inet6 fe80::20c:29ff:fef6:1ecf/64 scope link </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure>
+
+<p>关闭防火墙：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># service iptables stop		//关闭防火墙</span></span><br><span class="line">iptables: Setting chains to policy ACCEPT: filter          [  OK  ]</span><br><span class="line">iptables: Flushing firewall rules:                         [  OK  ]</span><br><span class="line">iptables: Unloading modules:                               [  OK  ]</span><br><span class="line">[root@server ~]<span class="comment"># chkconfig iptables off		//永久关闭防火墙</span></span><br><span class="line">[root@server ~]<span class="comment"># service iptables status	//查看防火墙的状态</span></span><br><span class="line">iptables: Firewall is not running.</span><br><span class="line">[root@server ~]<span class="comment"># getenforce		</span></span><br><span class="line">Enforcing</span><br><span class="line">[root@server ~]<span class="comment"># setenforce 0		//临时关闭防火墙</span></span><br><span class="line">[root@server ~]<span class="comment"># getenforce</span></span><br><span class="line">Permissive</span><br></pre></td></tr></table></figure>
+
+<p>安装服务以及配置文件：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># yum install -y bind</span></span><br><span class="line">[root@server ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line">options &#123;</span><br><span class="line">	listen-on port 53 &#123; any; &#125;;		//括号内的内容改为any（监听端口作用）</span><br><span class="line">//	listen-on-v6 port 53 &#123; ::1; &#125;;	//注释掉IPV6</span><br><span class="line">	directory 	<span class="string">"/var/named"</span>;</span><br><span class="line">	dump-file 	<span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line">        statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line">        memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line">	allow-query     &#123; any; &#125;;		//括号内的内容改为any(允许访问的IP)</span><br><span class="line">	recursion yes;</span><br><span class="line"></span><br><span class="line">[root@server ~]<span class="comment"># vim /etc/named.rfc1912.zones </span></span><br><span class="line">zone <span class="string">"zsh.com"</span> IN &#123;				//修改此处</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"name.zsh.com"</span>;		//修改此处</span><br><span class="line">	allow-update &#123; none; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"localhost"</span> IN &#123;</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"named.localhost"</span>;</span><br><span class="line">	allow-update &#123; none; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa"</span> IN &#123;</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"named.loopback"</span>;</span><br><span class="line">	allow-update &#123; none; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"211.128.192.in-addr.arpa"</span> IN &#123;	//修改此处</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"211.168.192.arpa"</span>;			//修改此处</span><br><span class="line">	allow-update &#123; none; &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># cp /var/named/named.localhost /var/named/www.zsh.com</span></span><br><span class="line">[root@server ~]<span class="comment"># vim /var/named/www.zsh.com</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  zsh.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">@       IN      NS      server.zsh.com.</span><br><span class="line">server  IN      A       192.168.211.150</span><br><span class="line">client  IN      A       192.168.211.151</span><br><span class="line">www     IN      A       192.168.211.120</span><br><span class="line"></span><br><span class="line">//参数解析</span><br><span class="line">@：该域的父域，此处为zsh.com</span><br><span class="line">IN:ininternet,使用TCP/IP协议</span><br><span class="line">SOA：设置授权主机名</span><br><span class="line">serial:序列号，当主DNS服务器更新数据后，增到该值，从服务器才会更新数据</span><br><span class="line">refresh:从服务器于主服务器序列号做对比</span><br><span class="line">retry:refresh失败后，经过指定时间再去尝试</span><br><span class="line">expire：从DNS服务器过期时间</span><br><span class="line">minimum：否定结果缓存时间</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># cp /var/named/named.localhost /var/named/211.168.192.arpa</span></span><br><span class="line">[root@server ~]<span class="comment"># vim /var/named/211.168.192.arpa</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@	IN SOA	zsh.com. rname.invalid. (</span><br><span class="line">					0	; serial</span><br><span class="line">					1D	; refresh</span><br><span class="line">					1H	; retry</span><br><span class="line">					1W	; expire</span><br><span class="line">					3H )	; minimum</span><br><span class="line">@	IN	NS	server.zsh.com.</span><br><span class="line">150	IN	PTR	server.zsh.com</span><br><span class="line">151	IN	PTR	client.zsh.com</span><br><span class="line">120	IN	PTR 	www.zsh.com</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># service named restart		//重启服务</span></span><br><span class="line">Stopping named: .                                          [  OK  ]</span><br><span class="line">Starting named:                                            [  OK  ]</span><br><span class="line"></span><br><span class="line">//给予named程序对于正向反向解析文件的读取权限，不然可能查询失败</span><br><span class="line">[root@server ~]<span class="comment"># chown named:named /var/named/name.zsh.com</span></span><br><span class="line">[root@server ~]<span class="comment"># chown named:named /var/named/211.168.192.arpa</span></span><br></pre></td></tr></table></figure>
+
+<p>客户端测试：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@client ~]<span class="comment"># yum install -y bind-utils</span></span><br><span class="line">[root@client ~]<span class="comment"># vim /etc/resolv.conf	//设置DNS指向server</span></span><br><span class="line">	nameserver 192.168.211.150</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200729172852.png" alt=""></p>
+<h2 id="DNS主从服务器配置"><a href="#DNS主从服务器配置" class="headerlink" title="DNS主从服务器配置"></a>DNS主从服务器配置</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@server ~]<span class="comment"># ntpdate ntp.api.bz		//同步时间，从服务器也要做，这里我以客户端为从服务器</span></span><br><span class="line">29 Jul 01:30:47 ntpdate[3328]: step time server 114.118.7.163 offset 1955698.964697 sec</span><br><span class="line"></span><br><span class="line">[root@client ~]<span class="comment"># ntpdate ntp.api.bz		//客户机也需要同步。</span></span><br><span class="line">29 Jul 17:33:41 ntpdate[2035]: step time server 114.118.7.161 offset -28799.915217 sec</span><br><span class="line"></span><br><span class="line">[root@server ~]<span class="comment"># cat /etc/named.rfc1912.zones</span></span><br><span class="line">zone <span class="string">"zsh.com"</span> IN &#123;</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"name.zsh.com"</span>;</span><br><span class="line">	allow-transfer &#123; 192.168.211.151; &#125;;		//允许同步的辅助DNS服务器</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"211.168.192.in-addr.arpa"</span> IN &#123;</span><br><span class="line">	<span class="built_in">type</span> master;</span><br><span class="line">	file <span class="string">"211.168.192.arpa"</span>;</span><br><span class="line">	allow-transfer &#123; 192.168.211.151; &#125;;		//允许同步的辅助DNS服务器</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">[root@server ~]<span class="comment"># vim /var/named/name.zsh.com</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  zsh.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">@       IN      NS      server.zsh.com.</span><br><span class="line">@       IN      NS      client.zsh.com.		//添加该从服务器</span><br><span class="line">server  IN      A       192.168.211.150</span><br><span class="line">client  IN      A       192.168.211.151</span><br><span class="line">www     IN      A       192.168.211.120</span><br><span class="line"></span><br><span class="line">[root@server ~]<span class="comment"># vim /var/named/name.211.128.192.arpa</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  zsh.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">@       IN      NS      server.zsh.com.</span><br><span class="line">@       IN      NS      client.zsh.com.		//添加该从服务器</span><br><span class="line">150     IN      PTR     server.zsh.com</span><br><span class="line">151     IN      PTR     client.zsh.com</span><br><span class="line">120     IN      PTR     www.zsh.com</span><br></pre></td></tr></table></figure>
+
+<p>从服务器配置</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@client ~]<span class="comment"># yum install -y bind</span></span><br><span class="line">[root@client etc]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line">options &#123;</span><br><span class="line">        listen-on port 53 &#123; any; &#125;;</span><br><span class="line">//      listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line">        directory       <span class="string">"/var/named"</span>;</span><br><span class="line">        dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line">        statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line">        memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line">        allow-query     &#123; any; &#125;;</span><br><span class="line">        recursion yes;</span><br><span class="line"></span><br><span class="line">        dnssec-enable no;		//“yes”改为“no”</span><br><span class="line">        dnssec-validation no;	//“yes”改为“no”</span><br><span class="line">        </span><br><span class="line">[root@client ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line">zone <span class="string">"zsh.com"</span> IN &#123;</span><br><span class="line">        <span class="built_in">type</span> slave;		//类型更改为slave</span><br><span class="line">        file <span class="string">"slaves/name.zsh.com"</span>;		//这里是slaves目录下的正向解析文件，必须是这个目录名</span><br><span class="line">        masters &#123; 192.168.211.150; &#125;;		//设置主的服务器地址</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone <span class="string">"211.168.192.in-addr.arpa"</span> IN &#123;</span><br><span class="line">        <span class="built_in">type</span> slave;		//类型更改为slave</span><br><span class="line">        file <span class="string">"slaves/211.168.192.arpa"</span>;</span><br><span class="line">        masters &#123; 192.168.211.150; &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">[root@client slaves]<span class="comment"># service named restart</span></span><br><span class="line">停止 named：                                               [确定]</span><br><span class="line">启动 named：                                               [确定]</span><br><span class="line"></span><br><span class="line">[root@client ~]<span class="comment"># ls /var/named/slaves</span></span><br><span class="line">211.168.192.arpa  name.zsh.com</span><br><span class="line"></span><br><span class="line">[root@client ~]<span class="comment"># setenforce 0</span></span><br><span class="line">[root@client ~]<span class="comment"># getenforce</span></span><br><span class="line">Permissive</span><br><span class="line">[root@client ~]<span class="comment"># service iptables stop</span></span><br><span class="line">iptables：将链设置为政策 ACCEPT：filter                    [确定]</span><br><span class="line">iptables：清除防火墙规则：                                 [确定]</span><br><span class="line">iptables：正在卸载模块：                                   [确定]</span><br></pre></td></tr></table></figure>
+
+<p>验证：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200729180917.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200729181037.png" alt=""></p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>DNS服务</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>本地hexo博客部署到服务器</title>
     <url>/2020/07/11/%E6%9C%AC%E5%9C%B0hexo%E9%83%A8%E7%BD%B2%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8/</url>
     <content><![CDATA[<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/5fddc6d846ac820bd374c9e08366ef94.jpg" alt="">本篇内容用来讲述如何将 hexo 博客部署到阿里云的服务器上。<a id="more"></a><br>只要通过三步即可成功部署：</p>
@@ -780,93 +978,35 @@
       </tags>
   </entry>
   <entry>
-    <title>我的世界Linux开服环境搭建</title>
-    <url>/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711132031.png" alt=""></p>
-<p>现在个人服务器价格以及基本进入大众可消费的水平，不是只有需要架设网站的用户才有服务器需求。我们也也可以来做很多事情，比如说搭建一个Minecraft的服务器，让我们可以很方便的与小伙伴联机，这篇主要就来通过Linux以及MCSM面板教大家搭建一个Minecraft服务器。</p>
-<p><font color=#FF0000 >喜欢或者有问题的同学，可以在下发评论留言哦！</font><a id="more"></a></p>
-<h3 id="MCSM面板搭建意义"><a href="#MCSM面板搭建意义" class="headerlink" title="MCSM面板搭建意义"></a>MCSM面板搭建意义</h3><p>1.方便管理服务器，关闭我的世界服务器以及上传和卸载插件都不用登录服务器执行命令，对新手服主非常友好。</p>
-<p>2.可以实时监控服务器状态，如剩余内存，CPU占用率等…</p>
-<h3 id="前期的准备工作"><a href="#前期的准备工作" class="headerlink" title="前期的准备工作"></a>前期的准备工作</h3><p>1.需要一台服务器，以及安装好Linux系统。    (本教程使用阿里云的学生机，系统使用CentOS7.4)</p>
-<p>2.远程SSH的控制软件。    （本教程使用 Xshell）</p>
-<p>3.我的世界服务器核心。    （本教程使用 KCauldron 1.7.10-1614）</p>
-<p>4.FTP软件,用于上传Minecratf服务器核心到服务器。    (本教程使用Xftp)</p>
-<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>1.推荐使用CentOS系统或者RedHat系统，其他Linux系统理论也能实现，但是命令可能有细微变化，所以本教程不推荐使用。</p>
-<p>2.如果部署失败请耐心重新再次开始，大家都是这样过来的。</p>
-<p>3.本教程不适用小白，如果不会使用SSH工具、安装服务器系统，建议老老实实去淘宝买别人搭建好的。</p>
-<h3 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h3><h4 id="系统更新"><a href="#系统更新" class="headerlink" title="系统更新"></a>系统更新</h4><p>确保你的Linux系统是最新的</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum update</span><br></pre></td></tr></table></figure>
+    <title>Active Directory 活动目录搭建</title>
+    <url>/2020/07/12/%E6%B4%BB%E5%8A%A8%E7%9B%AE%E5%BD%95%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<h1 id="域的简单介绍"><a href="#域的简单介绍" class="headerlink" title="域的简单介绍"></a>域的简单介绍</h1><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/01.jpg" alt=""></p>
+<p>为什么要使用域？假设你是公司的系统管理员，你们公司有一千台电脑。如果你要为每台电脑设置登录帐户，设置权限(比如是否允许登录帐户安装软件)，那你要分别坐在这一千台电脑前工作。如果你要做一些改变，你也要分别在这一千台电脑上修改。相信没有哪个管理员想要用这种不吃不喝不睡觉的方式来工作，所以就应运而生了域的概念。<a id="more"></a><br>下面列出了域的几个主要概念：</p>
+<p><strong>AD的全称是Active Directory</strong>：活动目录<br><strong>域（Domain）</strong>:<br>1)域是Windows网络中独立运行的单位，域之间相互访问则需要建立信任关系(即Trust Relation)。信任关系是连接在域与域之间的桥梁。当一个域与其他域建立了信任关系后<br>2)两个域之间不但可以按需要相互进行管理，还可以跨网分配文件和打印机等设备资源，使不同的域之间实现网络资源的共享与管理，以及相互通信和数据传输<br><strong>域控制器（DC）</strong>：<br>域控制器就是一台服务器，负责每一台联入网络的电脑和用户的验证工作。<br><strong>组织单元（OU）</strong><br><strong>用户名服务器名（CN）</strong></p>
+<h1 id="域服务器的搭建，创建域用户，计算机加入域"><a href="#域服务器的搭建，创建域用户，计算机加入域" class="headerlink" title="域服务器的搭建，创建域用户，计算机加入域"></a>域服务器的搭建，创建域用户，计算机加入域</h1><p>这里我使用windows server 2012 r2 搭建域服务器。</p>
+<p><strong>第一步：配置自己的网络。</strong></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712142622.png" style="zoom:50%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712141412.png" style="zoom:50%;" /></p>
+<p><strong>第二步：添加角色功能=&gt;安装’Active Directory域服务’，接着一路下一步，安装完即可。</strong><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135304.png" style="zoom: 80%;" /></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /></p>
+<p>域服务安装完成，下面需要把这台计算机提升为域控，进行如下配置。<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135920.png" style="zoom:80%;" /></p>
+<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712140120.png" style="zoom:80%;" />
 
-<h4 id="安装node-js"><a href="#安装node-js" class="headerlink" title="安装node.js"></a>安装node.js</h4><p>1.安装<code>github</code></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install git -y</span><br></pre></td></tr></table></figure>
-
-<p>2.安装<code>node.js</code>管理器等组件</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://github.com/creationix/nvm.git ~/nvm</span><br><span class="line"><span class="comment"># 设置nvm 自动运行</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"source ~/nvm/nvm.sh"</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br><span class="line"><span class="comment"># 查询node.js的版本</span></span><br><span class="line">nvm list-remote</span><br><span class="line"><span class="comment"># 安装node.js，目前最新版本为v14.4.0</span></span><br><span class="line">nvm install v14.4.0</span><br></pre></td></tr></table></figure>
-
-<p>3.安装结束之后，请重启服务器（重要！）</p>
-<h4 id="安装Java8"><a href="#安装Java8" class="headerlink" title="安装Java8"></a>安装Java8</h4><p>使用<code>yum</code>安装<code>java8</code>安装</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装java8</span></span><br><span class="line">yum install -y java</span><br><span class="line"><span class="comment">#查看java版本</span></span><br><span class="line">java -version</span><br></pre></td></tr></table></figure>
-
-<p>没有报错，成功回显版本号则安装Java成功</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711163245.png" alt=""></p>
-<h4 id="安装MCSM"><a href="#安装MCSM" class="headerlink" title="安装MCSM"></a>安装MCSM</h4><p>克隆<strong>MCSManager</strong>并安装依赖</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 克隆目录</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/suwings/mcsmanager.git</span><br><span class="line"><span class="comment"># cd至目录</span></span><br><span class="line"><span class="built_in">cd</span> mcsmanager/</span><br><span class="line"><span class="comment"># 安装依赖库</span></span><br><span class="line">npm install</span><br><span class="line"><span class="comment"># 启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
-
-<p>启动成功效果图</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134158.png" alt=""></p>
-<h4 id="保持后台运行"><a href="#保持后台运行" class="headerlink" title="保持后台运行"></a>保持后台运行</h4><p>先<code>Ctrl+C</code>关闭面板，我们使用<code>screen</code>软件来让面板保持后台运行。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装screen</span></span><br><span class="line">yum install screen -y</span><br><span class="line"><span class="comment"># 创建一个名为 mcsm 的窗口</span></span><br><span class="line">screen -S mcsm</span><br><span class="line"><span class="comment"># 在此新终端窗口内启动面板</span></span><br><span class="line">npm start</span><br></pre></td></tr></table></figure>
-
-<p>开启后可以直接与终端断开连接，面板讲保持后台运行。</p>
-<p><strong>若要重新控制，请输入命令即可：</strong></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">screen -r mcsm</span><br></pre></td></tr></table></figure>
-
-<h3 id="端口开放"><a href="#端口开放" class="headerlink" title="端口开放"></a>端口开放</h3><p>面板需要 23333（主功能） 端口与 20010 - 20200（FTP功能）端口区间。</p>
-<p>Minecraft需要开放25565（我的世界默认）端口号。</p>
-<p>如果你使用阿里云，腾讯云或者服务商，<strong>请进入控制台到防火墙安全组策略，放行以上端口。</strong></p>
-<h3 id="登录MCSM账户"><a href="#登录MCSM账户" class="headerlink" title="登录MCSM账户"></a>登录MCSM账户</h3><p>现在，访问 http://你的公网IP:23333/ 即可进入面板。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 开头带“#”为最高管理员权限（注意，管理员与管理员之间账号可互删）不带“#”为用户账户</span><br><span class="line">默认账号：#master</span><br><span class="line">默认密码: 123456</span><br></pre></td></tr></table></figure>
-
-<p>请及时修改密码。管理员可以互删。</p>
-<h3 id="FTP服务"><a href="#FTP服务" class="headerlink" title="FTP服务"></a>FTP服务</h3><p>需要使用FTP协议上传服务器核心到服务器上。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711134440.png" alt=""></p>
-<h3 id="MCSM面板使用"><a href="#MCSM面板使用" class="headerlink" title="MCSM面板使用"></a>MCSM面板使用</h3><p>1.创建实例，这里使用快速创建</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135100.png" alt=""></p>
-<p>2.根据提示设置好参数。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711135012.png" alt="[]()"></p>
-<h3 id="开启Minecraft服务器"><a href="#开启Minecraft服务器" class="headerlink" title="开启Minecraft服务器"></a>开启Minecraft服务器</h3><h4 id="EULA最终用户协议"><a href="#EULA最终用户协议" class="headerlink" title="EULA最终用户协议"></a>EULA最终用户协议</h4><p>第一次开服一定失败，返回你的<code>服务器根目录</code>,你会发现多了一个叫做eula.txt的文件，编辑它把 eula=false 改成 eula=true 就行了，这是EULA最终用户许克协议。</p>
-<p><strong>但是</strong>我希望所有服主可以看一看<code>EULA</code></p>
-<p>Minecraft EULA：<a href="https://account.mojang.com/documents/minecraft_eula" target="_blank" rel="noopener">官方汉化链接</a></p>
-<p><strong>以下两条比较重要 我更换了代词方便大家理解</strong></p>
-<ul>
-<li><p>不得将Mojang创建的任何内容用于商业用途；</p>
-</li>
-<li><p>不得试图通过Mojang创建的任何内容赚钱；</p>
-</li>
-</ul>
-<p>这意味着你几乎和开公益服没有区别，但是我们关起门来说话，违反<code>eula</code>的服务器与服主 全世界比比皆是</p>
-<p>这<strong>不代表</strong>你可以认为 你可以光明正大地开商业化服务器</p>
-<p>但在这种大环境下 我相信可怜的绝大部分人 做不到 不违反<code>eula</code></p>
-<p>所以 请你们抱着<strong>内疚，悔恨</strong>的心理 看待你开了违反<code>eula</code>的服务器这一事实</p>
-<p>刚刚气氛好沉重啊 让我们回归主题，继续把服务器开起来吧！</p>
-<h4 id="关闭正版验证"><a href="#关闭正版验证" class="headerlink" title="关闭正版验证"></a>关闭正版验证</h4><p>返回你的<code>服务器根目录</code>找到server.properties这个文件，编辑它，更改 online-mode=true 为online-mode=false</p>
-<p><strong>不关这个正版验证 如果你不是正版玩家你是进不去服务器的</strong></p>
-<p>当然，Mojang已经说过了，如果你现在买不起Minecraft，可以先玩，以后有能力了再来补票。</p>
-<p><strong>注意：</strong>正版玩家和盗版玩家是没有区别的！但我还是希望每个热爱这款游戏，有能力的玩家都可以去支持一下正版。</p>
-<p><strong>做了以上两步操作就可以通过面板开启服务器了</strong></p>
-<h3 id="进入Minecraft服务器"><a href="#进入Minecraft服务器" class="headerlink" title="进入Minecraft服务器"></a>进入Minecraft服务器</h3><p>插一嘴，我建议使用<code>HMCL</code>启动器</p>
-<p>官网链接：<a href="https://hmcl.huangyuhui.net/download" target="_blank" rel="noopener">HMCL启动器</a></p>
-<p>进入游戏之后选择多人游戏，然后添加服务器，服务器地址可以写ip或者域名。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140416.png" alt=""></p>
-<p>添加之后可以看到服务器已经开启，我们双击进入。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711140441.png" alt=""></p>
-<p>好的，我们的服务器就这样开起来了，是不是觉得很简单呢。</p>
+<p>然后一直下一步，直到安装成功电脑重启。</p>
+<p><strong>第三步：添加第二台计算器到此域。</strong></p>
+<p>首先还是更改S2的网络配置。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143249.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143227.png" style="zoom: 80%;" /></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143518.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143609.png" style="zoom: 60%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143803.png" style="zoom: 70%;" /></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144617.png" alt="">)<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144646.png" alt=""></p>
+<p>加入域成功，加入后进行重启，登录时用户名后加入@你的域名</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712145002.png" alt=""></p>
+<p>完~</p>
 ]]></content>
       <categories>
-        <category>Linux</category>
+        <category>Windows</category>
       </categories>
       <tags>
-        <tag>Minecraft</tag>
+        <tag>Active Directory</tag>
       </tags>
   </entry>
   <entry>
@@ -935,9 +1075,9 @@
         <category>网络</category>
       </categories>
       <tags>
-        <tag>OSPF</tag>
-        <tag>Trunk</tag>
         <tag>Vlan</tag>
+        <tag>Trunk</tag>
+        <tag>OSPF</tag>
       </tags>
   </entry>
   <entry>
@@ -1070,38 +1210,6 @@
         <tag>samba</tag>
         <tag>web</tag>
         <tag>DNS</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Active Directory 活动目录搭建</title>
-    <url>/2020/07/12/%E6%B4%BB%E5%8A%A8%E7%9B%AE%E5%BD%95%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<h1 id="域的简单介绍"><a href="#域的简单介绍" class="headerlink" title="域的简单介绍"></a>域的简单介绍</h1><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/01.jpg" alt=""></p>
-<p>为什么要使用域？假设你是公司的系统管理员，你们公司有一千台电脑。如果你要为每台电脑设置登录帐户，设置权限(比如是否允许登录帐户安装软件)，那你要分别坐在这一千台电脑前工作。如果你要做一些改变，你也要分别在这一千台电脑上修改。相信没有哪个管理员想要用这种不吃不喝不睡觉的方式来工作，所以就应运而生了域的概念。<a id="more"></a><br>下面列出了域的几个主要概念：</p>
-<p><strong>AD的全称是Active Directory</strong>：活动目录<br><strong>域（Domain）</strong>:<br>1)域是Windows网络中独立运行的单位，域之间相互访问则需要建立信任关系(即Trust Relation)。信任关系是连接在域与域之间的桥梁。当一个域与其他域建立了信任关系后<br>2)两个域之间不但可以按需要相互进行管理，还可以跨网分配文件和打印机等设备资源，使不同的域之间实现网络资源的共享与管理，以及相互通信和数据传输<br><strong>域控制器（DC）</strong>：<br>域控制器就是一台服务器，负责每一台联入网络的电脑和用户的验证工作。<br><strong>组织单元（OU）</strong><br><strong>用户名服务器名（CN）</strong></p>
-<h1 id="域服务器的搭建，创建域用户，计算机加入域"><a href="#域服务器的搭建，创建域用户，计算机加入域" class="headerlink" title="域服务器的搭建，创建域用户，计算机加入域"></a>域服务器的搭建，创建域用户，计算机加入域</h1><p>这里我使用windows server 2012 r2 搭建域服务器。</p>
-<p><strong>第一步：配置自己的网络。</strong></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712142622.png" style="zoom:50%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712141412.png" style="zoom:50%;" /></p>
-<p><strong>第二步：添加角色功能=&gt;安装’Active Directory域服务’，接着一路下一步，安装完即可。</strong><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135304.png" style="zoom: 80%;" /></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135637.png" style="zoom:80%;" /></p>
-<p>域服务安装完成，下面需要把这台计算机提升为域控，进行如下配置。<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712135920.png" style="zoom:80%;" /></p>
-<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712140120.png" style="zoom:80%;" />
-
-<p>然后一直下一步，直到安装成功电脑重启。</p>
-<p><strong>第三步：添加第二台计算器到此域。</strong></p>
-<p>首先还是更改S2的网络配置。</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143249.png" style="zoom:80%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143227.png" style="zoom: 80%;" /></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143518.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143609.png" style="zoom: 60%;" /><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712143803.png" style="zoom: 70%;" /></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144617.png" alt="">)<img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712144646.png" alt=""></p>
-<p>加入域成功，加入后进行重启，登录时用户名后加入@你的域名</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200712145002.png" alt=""></p>
-<p>完~</p>
-]]></content>
-      <categories>
-        <category>Windows</category>
-      </categories>
-      <tags>
-        <tag>Active Directory</tag>
       </tags>
   </entry>
 </search>

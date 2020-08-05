@@ -289,7 +289,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/04/samba/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/05/vsftpd%E6%9C%8D%E5%8A%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -303,7 +303,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/08/04/samba/" class="post-title-link" itemprop="url">Samba服务配置</a>
+            <a href="/2020/08/05/vsftpd%E6%9C%8D%E5%8A%A1/" class="post-title-link" itemprop="url">vsftpd服务</a>
         </h2>
 
         <div class="post-meta">
@@ -314,7 +314,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-08-04 02:01:41 / 修改时间：02:05:55" itemprop="dateCreated datePublished" datetime="2020-08-04T02:01:41+08:00">2020-08-04</time>
+              <time title="创建时间：2020-08-05 23:26:22 / 修改时间：23:27:58" itemprop="dateCreated datePublished" datetime="2020-08-05T23:26:22+08:00">2020-08-05</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -335,8 +335,207 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/2020/08/04/samba/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/04/samba/" itemprop="commentCount"></span>
+    <a title="valine" href="/2020/08/05/vsftpd%E6%9C%8D%E5%8A%A1/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/05/vsftpd%E6%9C%8D%E5%8A%A1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="vsftpd服务"><a href="#vsftpd服务" class="headerlink" title="vsftpd服务"></a>vsftpd服务</h2><p>关闭防火墙</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># service iptables stop</span></span><br><span class="line">iptables: Setting chains to policy ACCEPT: filter          [  OK  ]</span><br><span class="line">iptables: Flushing firewall rules:                         [  OK  ]</span><br><span class="line">iptables: Unloading modules:                               [  OK  ]</span><br><span class="line">[root@localhost ~]<span class="comment"># setenforce 0</span></span><br></pre></td></tr></table></figure>
+
+<p>安装vsftpd服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y vsftpd</span></span><br></pre></td></tr></table></figure>
+
+<p>配置vsftpd开启匿名访问</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line">anonymous_enable=YES			//允许匿名登录（默认开启）</span><br><span class="line">anon_upload_enable=YES			//允许匿名上传</span><br><span class="line">anon_mkdir_write_enable=YES		//允许匿名创建文件夹，但是不能删除</span><br><span class="line">anon_other_write_enable=YES		//允许匿名创建和删除</span><br><span class="line">[root@localhost ~]<span class="comment"># service vsftpd start</span></span><br><span class="line">Starting vsftpd <span class="keyword">for</span> vsftpd:                                [  OK  ]</span><br></pre></td></tr></table></figure>
+
+<p>设置匿名用户默认访问路径的权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># chmod 757 /var/ftp/pub</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ll /var/ftp</span></span><br><span class="line">total 4</span><br><span class="line">drwxr-xrwx. 2 root root 4096 Mar  1  2013 pub</span><br></pre></td></tr></table></figure>
+
+<p>Win10测试创建文件：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805160835.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805160915.png" alt=""></p>
+<h2 id="虚拟用户访问"><a href="#虚拟用户访问" class="headerlink" title="虚拟用户访问"></a>虚拟用户访问</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/yum.repos.d/dd.repo</span></span><br><span class="line">	enabled=0		//禁用本地源，更改为网络源。</span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y  db* pam*</span></span><br></pre></td></tr></table></figure>
+
+<p>配置虚拟用户</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /etc/vsftpd</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim /etc/vsftpd/ftpusers.txt	//奇数行为用户名，偶数行为密码</span></span><br><span class="line">tangxiaoyan		</span><br><span class="line">123</span><br><span class="line">yanxiaotang</span><br><span class="line">321</span><br><span class="line"></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># db_load -T -t hash -f ftpusers.txt ftpuser.db</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim /etc/pam.d/vsftpd</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># useradd -d /home/ftpusers -s /bin/nologin ftpusers</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line"></span><br><span class="line">ascii_upload_enable=YES</span><br><span class="line">ascii_download_enable=YES</span><br><span class="line">guest_enable=YES</span><br><span class="line">guest_username=ftpusers</span><br><span class="line">user_config_dir=/etc/vsftpd/vsftpd_user_conf</span><br><span class="line">virtual_use_local_privs=YES</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># service vsftpd restart</span></span><br><span class="line">Shutting down vsftpd:                                      [  OK  ]</span><br><span class="line">Starting vsftpd <span class="keyword">for</span> vsftpd:                                [  OK  ]</span><br></pre></td></tr></table></figure>
+
+<p>windows验证：</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175137.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175155.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175221.png" alt=""></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost vsftpd]<span class="comment"># mkdir vsftpd_user_conf</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># vim vsftpd_user_conf/tom</span></span><br><span class="line">local_root=/opt/kl</span><br><span class="line">[root@localhost vsftpd]<span class="comment"># mkdir /opt/kl</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># chmod 777 /opt/kl</span></span><br><span class="line">[root@localhost vsftpd]<span class="comment"># service vsftpd restart</span></span><br><span class="line">Shutting down vsftpd:                                      [  OK  ]</span><br><span class="line">Starting vsftpd <span class="keyword">for</span> vsftpd:                                [  OK  ]</span><br></pre></td></tr></table></figure>
+
+<p>windows登录tom用户然后创建文件夹</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175655.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805175531.png" alt=""></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/05/STP%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tangxiaoyan">
+      <meta itemprop="description" content="学海无涯苦作舟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tangxiaoyan's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/08/05/STP%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE/" class="post-title-link" itemprop="url">STP生成树协议</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-08-05 23:16:35 / 修改时间：23:26:00" itemprop="dateCreated datePublished" datetime="2020-08-05T23:16:35+08:00">2020-08-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/08/05/STP%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/05/STP%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="实验名称：STP生成树实验"><a href="#实验名称：STP生成树实验" class="headerlink" title="实验名称：STP生成树实验"></a>实验名称：STP生成树实验</h2><h2 id="实验拓扑："><a href="#实验拓扑：" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200805184356.png" alt=""></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/08/05/STP%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/04/Samba/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tangxiaoyan">
+      <meta itemprop="description" content="学海无涯苦作舟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tangxiaoyan's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/08/04/Samba/" class="post-title-link" itemprop="url">Samba服务配置</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-08-04 02:01:41 / 修改时间：17:10:26" itemprop="dateCreated datePublished" datetime="2020-08-04T02:01:41+08:00">2020-08-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/08/04/Samba/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/04/Samba/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -359,7 +558,7 @@
 <p>2.现有组uo，该组成员user1，user2，能对name进行读写操作，而组po成员user3，user4，只能对name有读的操作。对于共享目录kpl，则权限相反。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2020/08/04/samba/#more" rel="contents">
+              <a class="btn" href="/2020/08/04/Samba/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -958,186 +1157,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/18/windows%E5%AE%9E%E9%AA%8C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/18/windows%E5%AE%9E%E9%AA%8C/" class="post-title-link" itemprop="url">windows实验</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-07-18 10:19:50 / 修改时间：10:47:39" itemprop="dateCreated datePublished" datetime="2020-07-18T10:19:50+08:00">2020-07-18</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Windows/" itemprop="url" rel="index"><span itemprop="name">Windows</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/07/18/windows%E5%AE%9E%E9%AA%8C/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/18/windows%E5%AE%9E%E9%AA%8C/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Windows实验"><a href="#Windows实验" class="headerlink" title="Windows实验"></a>Windows实验</h1><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/213.jpg" alt=""></p>
-<p><strong>实验目的，搭建故障转移群集，把web与FTP服务的物理目录存放在故障转移服务器上，断开其中一个故障转移节点，验证能否访问web域ftp。</strong></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/18/windows%E5%AE%9E%E9%AA%8C/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/13/Nginx%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85SSL%E8%AF%81%E4%B9%A6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/07/13/Nginx%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85SSL%E8%AF%81%E4%B9%A6/" class="post-title-link" itemprop="url">Nginx服务安装SSL证书</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-07-13 22:16:40 / 修改时间：23:23:56" itemprop="dateCreated datePublished" datetime="2020-07-13T22:16:40+08:00">2020-07-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/07/13/Nginx%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85SSL%E8%AF%81%E4%B9%A6/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/13/Nginx%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85SSL%E8%AF%81%E4%B9%A6/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/u=3379754713,1922618047&fm=26&gp=0.jpg" alt=""></p>
-<p>本篇内容用来讲述如何配置Nginx，为服务器安装SSL证书，完成网页通过https的访问。
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/07/13/Nginx%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85SSL%E8%AF%81%E4%B9%A6/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1209,7 +1228,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1222,7 +1241,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
