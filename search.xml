@@ -979,8 +979,10 @@
     <title>Vrrp虚拟路由冗余协议</title>
     <url>/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/</url>
     <content><![CDATA[<h2 id="实验名称：VRRT虚拟路由冗余协议"><a href="#实验名称：VRRT虚拟路由冗余协议" class="headerlink" title="实验名称：VRRT虚拟路由冗余协议"></a>实验名称：VRRT虚拟路由冗余协议</h2><h2 id="实验拓扑："><a href="#实验拓扑：" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815193012.png" alt=""></p>
-<h2 id="实验需求："><a href="#实验需求：" class="headerlink" title="实验需求："></a>实验需求：</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">1、共有6个VLAN，为VLAN1~6，都运行MSTP协议，要求让SW2作为VLAN1~3的根网桥，同时作为VLAN4~6的备份根网桥；让SW3作为VLAN4~6的根网桥，同时作为VLAN1~3的备份根网桥</span><br><span class="line"></span><br><span class="line">2、将SW2与SW3相连的链路捆梆成以太通道，并允许所有VLAN的流量通过</span><br><span class="line"></span><br><span class="line">3、通过VRRP实现网关的可靠性，并跟踪端口，保证当链路出现故障时可切换链路，以恢复网络通畅</span><br><span class="line"></span><br><span class="line">4、为了适应网络的灵活变化，内网通过RIPv2运态路由进行互联</span><br></pre></td></tr></table></figure>
-
+<h2 id="实验需求："><a href="#实验需求：" class="headerlink" title="实验需求："></a>实验需求：</h2><p>1、共有6个VLAN，为VLAN1-6，都运行MSTP协议，要求让SW2作为VLAN1-3的根网桥，同时作为VLAN4-6的备份根网桥；让SW3作为VLAN4-6的根网桥，同时作为VLAN1-3的备份根网桥</p>
+<p>2、将SW2与SW3相连的链路捆梆成以太通道，并允许所有VLAN的流量通过</p>
+<p>3、通过VRRP实现网关的可靠性，并跟踪端口，保证当链路出现故障时可切换链路，以恢复网络通畅</p>
+<p>4、为了适应网络的灵活变化，内网通过RIPv2运态路由进行互联</p>
 <a id="more"></a>
 
 <h2 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h2><p>按照要求配置链路聚合，交换机与交换机之间使用Trunk链路，SW4与PC之间使用Access链路，创建VLAN1-6，SW2,SW3开启三层功能与R1一起配置RIP,SW2与SW3配置Vrrp，保证网络通信的连续性和可靠性，同时实现全网互通。</p>
