@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32avatar.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16avatar.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="实验名称：VRRT虚拟路由冗余协议实验拓扑：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vrrp虚拟路由冗余协议">
+<meta property="og:url" content="http://yoursite.com/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/index.html">
+<meta property="og:site_name" content="Tangxiaoyan&#39;s Blog">
+<meta property="og:description" content="实验名称：VRRT虚拟路由冗余协议实验拓扑：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815193012.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815153405.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815153548.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815154527.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815160848.png">
+<meta property="article:published_time" content="2020-08-15T12:05:50.000Z">
+<meta property="article:modified_time" content="2020-08-15T12:10:39.626Z">
+<meta property="article:author" content="Tangxiaoyan">
+<meta property="article:tag" content="Trunk">
+<meta property="article:tag" content="Vrrp协议">
+<meta property="article:tag" content="Rip">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815193012.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Vrrp虚拟路由冗余协议 | Tangxiaoyan's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a href="https://github.com/TangXiaoYani" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tangxiaoyan's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">分享是奉献的果实</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tangxiaoyan">
+      <meta itemprop="description" content="学海无涯苦作舟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tangxiaoyan's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vrrp虚拟路由冗余协议
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-08-15 20:05:50 / 修改时间：20:10:39" itemprop="dateCreated datePublished" datetime="2020-08-15T20:05:50+08:00">2020-08-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="实验名称：VRRT虚拟路由冗余协议"><a href="#实验名称：VRRT虚拟路由冗余协议" class="headerlink" title="实验名称：VRRT虚拟路由冗余协议"></a>实验名称：VRRT虚拟路由冗余协议</h2><h2 id="实验拓扑："><a href="#实验拓扑：" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815193012.png" alt=""></p>
+<a id="more"></a>
+
+<h2 id="实验需求："><a href="#实验需求：" class="headerlink" title="实验需求："></a>实验需求：</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1、共有6个VLAN，为VLAN1~6，都运行MSTP协议，要求让SW2作为VLAN1~3的根网桥，同时作为VLAN4~6的备份根网桥；让SW3作为VLAN4~6的根网桥，同时作为VLAN1~3的备份根网桥</span><br><span class="line"></span><br><span class="line">2、将SW2与SW3相连的链路捆梆成以太通道，并允许所有VLAN的流量通过</span><br><span class="line"></span><br><span class="line">3、通过VRRP实现网关的可靠性，并跟踪端口，保证当链路出现故障时可切换链路，以恢复网络通畅</span><br><span class="line"></span><br><span class="line">4、为了适应网络的灵活变化，内网通过RIPv2运态路由进行互联</span><br></pre></td></tr></table></figure>
+
+<h2 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h2><p>按照要求配置链路聚合，交换机与交换机之间使用Trunk链路，SW4与PC之间使用Access链路，创建VLAN1-6，SW2,SW3开启三层功能与R1一起配置RIP,SW2与SW3配置Vrrp，保证网络通信的连续性和可靠性，同时实现全网互通。</p>
+<h2 id="实验步骤："><a href="#实验步骤：" class="headerlink" title="实验步骤："></a>实验步骤：</h2><p>步骤一：先<strong>在SW2和SW3的直连链路上配置链路聚合</strong>，交换机之间配置Trunk链路，交换机与PC之间配置Access链路，路由器各接口配置好IP。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">R1:</span><br><span class="line">R1(config)<span class="comment">#int e0/0</span></span><br><span class="line">R1(config-if)<span class="comment">#ip add 192.168.5.5 255.255.255.0</span></span><br><span class="line">R1(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">R1(config-if)<span class="comment">#int e0/1</span></span><br><span class="line">R1(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 03:28:35.207: %LINK-3-UPDOWN: Interface Ethernet0/0, changed state to up</span><br><span class="line">*Aug 14 03:28:36.209: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br><span class="line">R1(config-if)<span class="comment">#ip add 192.168.6.6 255.255.255.0</span></span><br><span class="line">R1(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">R1(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 03:29:16.364: %LINK-3-UPDOWN: Interface Ethernet0/1, changed state to up</span><br><span class="line">*Aug 14 03:29:17.369: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/1, changed state to up</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">SW2:</span><br><span class="line">SW2(config-vlan)<span class="comment">#vlan 1,2,3,4,5,6 </span></span><br><span class="line">SW2(config-vlan)<span class="comment">#exit</span></span><br><span class="line">SW2(config)<span class="comment">#int range e0/1-2</span></span><br><span class="line">SW2(config-if-range)<span class="comment">#channel-group 1 mode on</span></span><br><span class="line">Creating a port-channel interface Port-channel 1</span><br><span class="line"></span><br><span class="line">SW2(config-if-range)<span class="comment">#</span></span><br><span class="line">*Aug 14 03:32:17.241: %LINEPROTO-5-UPDOWN: Line protocol on Interface Port-channel1, changed state to up</span><br><span class="line">SW2(config-if-range)<span class="comment">#exit</span></span><br><span class="line">SW2(config)<span class="comment">#int port 1</span></span><br><span class="line">SW2(config-if)<span class="comment">#switchport trunk en dot1q</span></span><br><span class="line">SW2(config-if)<span class="comment">#switchport mode trunk</span></span><br><span class="line">SW2(config-if)<span class="comment">#exit</span></span><br><span class="line">*Aug 14 03:34:10.806: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/2, changed state to down</span><br><span class="line">SW2(config)<span class="comment">#</span></span><br><span class="line">*Aug 14 03:34:11.797: %LINK-3-UPDOWN: Interface Port-channel1, changed state to down</span><br><span class="line">SW2(config)<span class="comment">#</span></span><br><span class="line">*Aug 14 03:34:13.809: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/2, changed state to up</span><br><span class="line">SW2(config)<span class="comment">#</span></span><br><span class="line">*Aug 14 03:34:14.805: %LINK-3-UPDOWN: Interface Port-channel1, changed state to up</span><br><span class="line">SW2(config)<span class="comment">#int e0/3   </span></span><br><span class="line">SW2(config-if)<span class="comment">#switchport trunk en dot1q</span></span><br><span class="line">SW2(config-if)<span class="comment">#switchport mode trunk</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">SW3:</span><br><span class="line">SW3(config)<span class="comment">#vlan 1,2,3,4,5,6</span></span><br><span class="line">SW3(config)<span class="comment">#exit</span></span><br><span class="line">SW3(config)<span class="comment">#int range e0/1-2</span></span><br><span class="line">SW3(config-if-range)<span class="comment">#channel-group 1 mode on</span></span><br><span class="line">Creating a port-channel interface Port-channel 1</span><br><span class="line"></span><br><span class="line">SW3(config-if-range)<span class="comment">#</span></span><br><span class="line">*Aug 14 03:33:16.005: %LINEPROTO-5-UPDOWN: Line protocol on Interface Port-channel1, changed state to up</span><br><span class="line">SW3(config-if-range)<span class="comment">#</span></span><br><span class="line">*Aug 14 03:34:12.809: %SPANTREE-7-RECV_1Q_NON_TRUNK: Received 802.1Q BPDU on non trunk Port-channel1 VLAN1.</span><br><span class="line">*Aug 14 03:34:12.809: %SPANTREE-7-BLOCK_PORT_TYPE: Blocking Port-channel1 on VLAN0001. Inconsistent port <span class="built_in">type</span>.</span><br><span class="line">SW3(config-if-range)<span class="comment">#exit</span></span><br><span class="line">SW3(config)<span class="comment">#int port 1</span></span><br><span class="line">SW3(config-if)<span class="comment">#switchport trunk en dot1q</span></span><br><span class="line">SW3(config-if)<span class="comment">#switchport mode dot1q</span></span><br><span class="line">SW3(config-if)<span class="comment">#int e0/3</span></span><br><span class="line">SW3(config-if)<span class="comment">#switchport trunk en dot1q</span></span><br><span class="line">SW3(config-if)<span class="comment">#switchport mode trunk</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">SW4:</span><br><span class="line">Switch(config)<span class="comment">#vlan 1,2,3,4,5,6</span></span><br><span class="line">Switch(config-vlan)<span class="comment">#hostname SW4</span></span><br><span class="line">SW4(config)<span class="comment">#int range e0/0-1</span></span><br><span class="line">SW4(config-if-range)<span class="comment">#switchport trunk en dot1q</span></span><br><span class="line">SW4(config-if-range)<span class="comment">#switchport mode trunk</span></span><br><span class="line">SW4(config-if-range)<span class="comment">#exit</span></span><br><span class="line">SW4(config)<span class="comment">#int e0/2 </span></span><br><span class="line">SW4(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">SW4(config-if)<span class="comment">#switchport access vlan 1</span></span><br><span class="line">SW4(config-if)<span class="comment">#int e0/3</span></span><br><span class="line">SW4(config-if)<span class="comment">#switchport mode access </span></span><br><span class="line">SW4(config-if)<span class="comment">#switchport access vlan 2</span></span><br><span class="line">SW4(config-if)<span class="comment">#int e1/0</span></span><br><span class="line">SW4(config-if)<span class="comment">#switchport mode access </span></span><br><span class="line">SW4(config-if)<span class="comment">#switchport access vlan 3</span></span><br><span class="line">SW4(config-if)<span class="comment">#int e1/1</span></span><br><span class="line">SW4(config-if)<span class="comment">#switchport mode access</span></span><br><span class="line">SW4(config-if)<span class="comment">#switchport access vlan 4</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>步骤二：在每台交换机上<strong>启动MSTP协议</strong>，根据题目要求<strong>设置根网桥以以及备份网桥</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">SW2:</span><br><span class="line">SW2(config)<span class="comment">#spanning-tree mode mst</span></span><br><span class="line">SW2(config)<span class="comment">#spanning-tree mst config</span></span><br><span class="line">SW2(config-mst)<span class="comment">#name tang</span></span><br><span class="line">SW2(config-mst)<span class="comment">#revision 2</span></span><br><span class="line">SW2(config-mst)<span class="comment">#in 1 vlan 1,2,3</span></span><br><span class="line">SW2(config-mst)<span class="comment">#in 2 vlan 4,5,6</span></span><br><span class="line">SW2(config-mst)<span class="comment">#exit</span></span><br><span class="line">SW2(config)<span class="comment">#spanning-tree mst 1 root p</span></span><br><span class="line">SW2(config)<span class="comment">#spanning-tree mst 2 root s</span></span><br><span class="line">SW2(config)<span class="comment">#do show spanning-tree</span></span><br><span class="line"></span><br><span class="line">MST0</span><br><span class="line">  Spanning tree enabled protocol mstp</span><br><span class="line">  Root ID    Priority    32768</span><br><span class="line">             Address     aabb.cc00.2000</span><br><span class="line">             This bridge is the root</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">  Bridge ID  Priority    32768  (priority 32768 sys-id-ext 0)</span><br><span class="line">             Address     aabb.cc00.2000</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">Interface           Role Sts Cost      Prio.Nbr Type</span><br><span class="line">------------------- ---- --- --------- -------- --------------------------------</span><br><span class="line">Et0/0               Desg FWD 2000000   128.1    Shr </span><br><span class="line">Et0/3               Desg FWD 2000000   128.4    Shr </span><br><span class="line">Po1                 Desg FWD 1000000   128.65   Shr </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">          </span><br><span class="line">MST1</span><br><span class="line">  Spanning tree enabled protocol mstp</span><br><span class="line">  Root ID    Priority    24577</span><br><span class="line">             Address     aabb.cc00.2000</span><br><span class="line">             This bridge is the root</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">  Bridge ID  Priority    24577  (priority 24576 sys-id-ext 1)</span><br><span class="line">             Address     aabb.cc00.2000</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">Interface           Role Sts Cost      Prio.Nbr Type</span><br><span class="line">------------------- ---- --- --------- -------- --------------------------------</span><br><span class="line">Et0/0               Desg FWD 2000000   128.1    Shr </span><br><span class="line">Et0/3               Desg FWD 2000000   128.4    Shr </span><br><span class="line">Po1                 Desg FWD 1000000   128.65   Shr </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">          </span><br><span class="line">MST2</span><br><span class="line">  Spanning tree enabled protocol mstp</span><br><span class="line">  Root ID    Priority    24578</span><br><span class="line">             Address     aabb.cc00.3000</span><br><span class="line">             Cost        1000000</span><br><span class="line">             Port        65 (Port-channel1)</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">  Bridge ID  Priority    28674  (priority 28672 sys-id-ext 2)</span><br><span class="line">             Address     aabb.cc00.2000</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">Interface           Role Sts Cost      Prio.Nbr Type</span><br><span class="line">------------------- ---- --- --------- -------- --------------------------------</span><br><span class="line">Et0/3               Desg FWD 2000000   128.4    Shr </span><br><span class="line">Po1                 Root FWD 1000000   128.65   Shr</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">SW3:</span><br><span class="line">SW3(config)<span class="comment">#spanning-tree mode mst</span></span><br><span class="line">SW3(config)<span class="comment">#spanning-tree mst config</span></span><br><span class="line">SW3(config-mst)<span class="comment">#name tang</span></span><br><span class="line">SW3(config-mst)<span class="comment">#revision 2</span></span><br><span class="line">SW3(config-mst)<span class="comment">#in 1 vlan 1,2,3 </span></span><br><span class="line">SW3(config-mst)<span class="comment">#in 2 vlan 4,5,6</span></span><br><span class="line">SW3(config-mst)<span class="comment">#exit</span></span><br><span class="line">SW3(config)<span class="comment">#spanning-tree mst 1 root s </span></span><br><span class="line">SW3(config)<span class="comment">#spanning-tree mst 2 root p</span></span><br><span class="line">SW3(config)<span class="comment">#do show spanning-tree</span></span><br><span class="line"></span><br><span class="line">MST0</span><br><span class="line">  Spanning tree enabled protocol mstp</span><br><span class="line">  Root ID    Priority    32768</span><br><span class="line">             Address     aabb.cc00.2000</span><br><span class="line">             Cost        0</span><br><span class="line">             Port        65 (Port-channel1)</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">  Bridge ID  Priority    32768  (priority 32768 sys-id-ext 0)</span><br><span class="line">             Address     aabb.cc00.3000</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">Interface           Role Sts Cost      Prio.Nbr Type</span><br><span class="line">------------------- ---- --- --------- -------- --------------------------------</span><br><span class="line">Et0/0               Desg FWD 2000000   128.1    Shr </span><br><span class="line">Et0/3               Desg FWD 2000000   128.4    Shr </span><br><span class="line">Po1                 Root FWD 1000000   128.65   Shr </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">          </span><br><span class="line">MST1</span><br><span class="line">  Spanning tree enabled protocol mstp</span><br><span class="line">  Root ID    Priority    24577</span><br><span class="line">             Address     aabb.cc00.2000</span><br><span class="line">             Cost        1000000</span><br><span class="line">             Port        65 (Port-channel1)</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">  Bridge ID  Priority    28673  (priority 28672 sys-id-ext 1)</span><br><span class="line">             Address     aabb.cc00.3000</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">Interface           Role Sts Cost      Prio.Nbr Type</span><br><span class="line">------------------- ---- --- --------- -------- --------------------------------</span><br><span class="line">Et0/0               Desg FWD 2000000   128.1    Shr </span><br><span class="line">Et0/3               Desg FWD 2000000   128.4    Shr </span><br><span class="line">Po1                 Root FWD 1000000   128.65   Shr </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">          </span><br><span class="line">MST2</span><br><span class="line">  Spanning tree enabled protocol mstp</span><br><span class="line">  Root ID    Priority    24578</span><br><span class="line">             Address     aabb.cc00.3000</span><br><span class="line">             This bridge is the root</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">  Bridge ID  Priority    24578  (priority 24576 sys-id-ext 2)</span><br><span class="line">             Address     aabb.cc00.3000</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">Interface           Role Sts Cost      Prio.Nbr Type</span><br><span class="line">------------------- ---- --- --------- -------- --------------------------------</span><br><span class="line">Et0/3               Desg FWD 2000000   128.4    Shr </span><br><span class="line">Po1                 Desg FWD 1000000   128.65   Shr</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">SW4:</span><br><span class="line">SW4(config-if)<span class="comment">#spanning-tree mode mst</span></span><br><span class="line">SW4(config)<span class="comment">#spanning-tree mst config</span></span><br><span class="line">SW4(config-mst)<span class="comment">#name tang</span></span><br><span class="line">SW4(config-mst)<span class="comment">#revision 2</span></span><br><span class="line">SW4(config-mst)<span class="comment">#in 1 vlan 1,2,3 </span></span><br><span class="line">SW4(config-mst)<span class="comment">#in 2 vlan 4,5,6</span></span><br><span class="line">SW4(config)<span class="comment">#do show spanning-tree</span></span><br><span class="line"></span><br><span class="line">MST0</span><br><span class="line">  Spanning tree enabled protocol mstp</span><br><span class="line">  Root ID    Priority    32768</span><br><span class="line">             Address     aabb.cc00.2000</span><br><span class="line">             Cost        0</span><br><span class="line">             Port        1 (Ethernet0/0)</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">  Bridge ID  Priority    32768  (priority 32768 sys-id-ext 0)</span><br><span class="line">             Address     aabb.cc00.4000</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">Interface           Role Sts Cost      Prio.Nbr Type</span><br><span class="line">------------------- ---- --- --------- -------- --------------------------------</span><br><span class="line">Et0/0               Root FWD 2000000   128.1    Shr </span><br><span class="line">Et0/1               Altn BLK 2000000   128.2    Shr </span><br><span class="line">Et0/2               Desg FWD 2000000   128.3    Shr </span><br><span class="line">Et0/3               Desg FWD 2000000   128.4    Shr </span><br><span class="line">Et1/0               Desg FWD 2000000   128.5    Shr </span><br><span class="line">Et1/1               Desg FWD 2000000   128.6    Shr </span><br><span class="line">Et1/2               Desg FWD 2000000   128.7    Shr </span><br><span class="line">Et1/3               Desg FWD 2000000   128.8    Shr </span><br><span class="line">          </span><br><span class="line">          </span><br><span class="line">          </span><br><span class="line">MST1</span><br><span class="line">  Spanning tree enabled protocol mstp</span><br><span class="line">  Root ID    Priority    24577</span><br><span class="line">             Address     aabb.cc00.2000</span><br><span class="line">             Cost        2000000</span><br><span class="line">             Port        1 (Ethernet0/0)</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)</span><br><span class="line">             Address     aabb.cc00.4000</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">Interface           Role Sts Cost      Prio.Nbr Type</span><br><span class="line">------------------- ---- --- --------- -------- --------------------------------</span><br><span class="line">Et0/0               Root FWD 2000000   128.1    Shr </span><br><span class="line">Et0/1               Altn BLK 2000000   128.2    Shr </span><br><span class="line">Et0/2               Desg FWD 2000000   128.3    Shr </span><br><span class="line">Et0/3               Desg FWD 2000000   128.4    Shr </span><br><span class="line">Et1/0               Desg FWD 2000000   128.5    Shr </span><br><span class="line">Et1/2               Desg FWD 2000000   128.7    Shr </span><br><span class="line">Et1/3               Desg FWD 2000000   128.8    Shr </span><br><span class="line"></span><br><span class="line">          </span><br><span class="line">          </span><br><span class="line">MST2</span><br><span class="line">  Spanning tree enabled protocol mstp</span><br><span class="line">  Root ID    Priority    24578</span><br><span class="line">             Address     aabb.cc00.3000</span><br><span class="line">             Cost        2000000</span><br><span class="line">             Port        2 (Ethernet0/1)</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">  Bridge ID  Priority    32770  (priority 32768 sys-id-ext 2)</span><br><span class="line">             Address     aabb.cc00.4000</span><br><span class="line">             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec</span><br><span class="line"></span><br><span class="line">Interface           Role Sts Cost      Prio.Nbr Type</span><br><span class="line">------------------- ---- --- --------- -------- --------------------------------</span><br><span class="line">Et0/0               Altn BLK 2000000   128.1    Shr </span><br><span class="line">Et0/1               Root FWD 2000000   128.2    Shr </span><br><span class="line">Et1/1               Desg FWD 2000000   128.6    Shr</span><br></pre></td></tr></table></figure>
+
+<p>步骤三：SW2中配置VLAN1、VLAN2、VLAN3、VLAN4 、VLAN5、VLAN6的IP地址，SW2与SW3<strong>开启三层路由</strong>功能，SW2，SW3，SW4<strong>关闭CEF路由模块</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">SW2:</span><br><span class="line">SW2(config)<span class="comment">#no ip cef</span></span><br><span class="line">SW2(config)<span class="comment">#ip routing</span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 1</span></span><br><span class="line">SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">SW2(config-if)<span class="comment">#  </span></span><br><span class="line">*Aug 14 05:16:46.402: %LINK-3-UPDOWN: Interface Vlan1, changed state to up</span><br><span class="line">*Aug 14 05:16:47.405: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to up</span><br><span class="line">SW2(config-if)<span class="comment">#ip add 192.168.1.1 255.255.255.0</span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 2</span></span><br><span class="line">SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 05:16:54.314: %LINK-3-UPDOWN: Interface Vlan2, changed state to up</span><br><span class="line">*Aug 14 05:16:55.320: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan2, changed state to up</span><br><span class="line">SW2(config-if)<span class="comment">#ip add 192.168.2.1 255.255.255.0</span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 3</span></span><br><span class="line">SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 05:17:12.533: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan3, changed state to down</span><br><span class="line">SW2(config-if)<span class="comment"># </span></span><br><span class="line">*Aug 14 05:17:15.228: %LINK-3-UPDOWN: Interface Vlan3, changed state to up</span><br><span class="line">*Aug 14 05:17:16.234: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan3, changed state to up</span><br><span class="line">SW2(config-if)<span class="comment">#ip add 192.168.3.1 255.255.255.0</span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 4</span></span><br><span class="line">SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 05:18:39.325: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan4, changed state to down</span><br><span class="line">SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 05:18:44.858: %LINK-3-UPDOWN: Interface Vlan4, changed state to up</span><br><span class="line">SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 05:18:45.863: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan4, changed state to up</span><br><span class="line">SW2(config-if)<span class="comment">#ip add 192.168.4.1 255.255.255.0</span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 5</span></span><br><span class="line">SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 05:18:58.325: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan5, changed state to down</span><br><span class="line">SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 05:19:03.848: %LINK-3-UPDOWN: Interface Vlan5, changed state to up</span><br><span class="line">*Aug 14 07:19:04.853: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan5, changed state to up</span><br><span class="line">SW2(config-if)<span class="comment">#ip add 192.168.5.1 255.255.255.0</span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 6 </span></span><br><span class="line">*Aug 14 05:19:38.325: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan6,</span><br><span class="line">SW2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 07:36:12.153: %LINK-3-UPDOWN: Interface Vlan6, changed state to up</span><br><span class="line">SW2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 14 07:36:13.158: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan6, changed state to up</span><br><span class="line">SW2(config-if)<span class="comment">#ip add 192.168.6.1 255.255.255.0</span></span><br><span class="line">SW2(config-if)<span class="comment">#do show ip int br</span></span><br><span class="line">Interface              IP-Address      OK? Method Status                Protocol</span><br><span class="line">Ethernet0/0            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Ethernet0/1            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Ethernet0/2            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Ethernet0/3            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Port-channel1          unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Vlan1                  192.168.1.1     YES manual up                    up      </span><br><span class="line">Vlan2                  192.168.2.1     YES manual up                    up      </span><br><span class="line">Vlan3                  192.168.3.1     YES manual up                    up      </span><br><span class="line">Vlan4                  192.168.4.1     YES manual up                    up      </span><br><span class="line">Vlan5                  192.168.5.1     YES manual up                    up      </span><br><span class="line">Vlan6                  192.168.6.1     YES manual up                    up</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">SW3:</span><br><span class="line">SW3(config)<span class="comment">#ip routing</span></span><br><span class="line">SW3(config)<span class="comment">#no ip cef</span></span><br><span class="line">SW3(config)<span class="comment">#interface Vlan1</span></span><br><span class="line">SW3(config)<span class="comment">#ip address 192.168.1.2 255.255.255.0</span></span><br><span class="line">SW3(config)<span class="comment">#no shutdown</span></span><br><span class="line">SW3(config)<span class="comment">#interface Vlan2</span></span><br><span class="line">SW3(config)<span class="comment">#ip address 192.168.2.2 255.255.255.0</span></span><br><span class="line">SW3(config)<span class="comment">#no shutdown</span></span><br><span class="line">SW3(config)<span class="comment">#interface Vlan3</span></span><br><span class="line">SW3(config)<span class="comment">#ip address 192.168.3.2 255.255.255.0</span></span><br><span class="line">SW3(config)<span class="comment">#no shutdown</span></span><br><span class="line">SW3(config)<span class="comment">#interface Vlan4</span></span><br><span class="line">SW3(config)<span class="comment">#ip address 192.168.4.2 255.255.255.0</span></span><br><span class="line">SW3(config)<span class="comment">#no shutdown</span></span><br><span class="line">SW3(config)<span class="comment">#interface Vlan5</span></span><br><span class="line">SW3(config)<span class="comment">#ip address 192.168.5.2 255.255.255.0</span></span><br><span class="line">SW3(config)<span class="comment">#no shutdown</span></span><br><span class="line">SW3(config)<span class="comment">#nterface Vlan6</span></span><br><span class="line">SW3(config)<span class="comment">#ip address 192.168.6.2 255.255.255.0</span></span><br><span class="line">SW3(config)<span class="comment">#vrrp 6 ip 192.168.6.254</span></span><br><span class="line">SW3(config)<span class="comment">#no shutdown</span></span><br><span class="line">SW3(config)<span class="comment">#do show ip int br</span></span><br><span class="line">Interface              IP-Address      OK? Method Status                Protocol</span><br><span class="line">Ethernet0/0            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Ethernet0/1            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Ethernet0/2            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Ethernet0/3            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Port-channel1          unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Vlan1                  192.168.1.2     YES manual up                    up      </span><br><span class="line">Vlan2                  192.168.2.2     YES manual up                    up      </span><br><span class="line">Vlan3                  192.168.3.2     YES manual up                    up      </span><br><span class="line">Vlan4                  192.168.4.2     YES manual up                    up      </span><br><span class="line">Vlan5                  192.168.5.2     YES manual up                    up      </span><br><span class="line">Vlan6                  192.168.6.2     YES manual up                    up</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SW4:</span><br><span class="line">SW4(config)<span class="comment">#no ip cef</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>步骤四：配置SW2，SW3的VLAN1、VLAN2、VLAN3、VLAN4、VLAN5、VLAN6的VRRP协议。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">SW2:</span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 1</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 1  ip 192.168.1.254</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 1 priority 200</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 1 preempt</span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 2</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 2 ip 192.168.2.254</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 2 priority 200</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 2 preempt </span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 3</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 3 ip 192.168.3.254</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 3 priority 200</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 3 preempt</span></span><br><span class="line">SW2(config)<span class="comment">#int vlan 4</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 4 ip 192.168.4.254</span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 5</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 5 ip 192.168.5.254</span></span><br><span class="line">SW2(config-if)<span class="comment">#int vlan 6</span></span><br><span class="line">SW2(config-if)<span class="comment">#vrrp 6 ip 192.168.6.254</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">SW3:</span><br><span class="line">SW3(config-if)<span class="comment">#int vlan 1</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 1  ip 192.168.1.254</span></span><br><span class="line">SW3(config-if)<span class="comment">#int vlan 2</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 2 ip 192.168.2.254</span></span><br><span class="line">SW3(config-if)<span class="comment">#int vlan 3</span></span><br><span class="line">SW3(config)<span class="comment">#int vlan 4</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 4 ip 192.168.4.254</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 4 priority 200</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 4 preempt</span></span><br><span class="line">SW3(config-if)<span class="comment">#int vlan 5</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 5 ip 192.168.5.254</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 5 priority 200</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 5 preempt</span></span><br><span class="line">SW3(config-if)<span class="comment">#int vlan 6</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 6 ip 192.168.6.254</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 6 priority 200</span></span><br><span class="line">SW3(config-if)<span class="comment">#vrrp 6 preempt</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815153405.png" alt=""></p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815153548.png" alt=""></p>
+<p>步骤五：SW2，SW3和R1配置RIP协议。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SW2:</span><br><span class="line">SW2(config)<span class="comment">#router rip</span></span><br><span class="line">SW2(config-router)<span class="comment">#version 2</span></span><br><span class="line">SW2(config-router)<span class="comment">#no auto</span></span><br><span class="line">SW2(config-router)<span class="comment">#network 0.0.0.0</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SW3:</span><br><span class="line">SW3(config)<span class="comment">#router rip</span></span><br><span class="line">SW3(config-router)<span class="comment">#version 2</span></span><br><span class="line">SW3(config-router)<span class="comment">#no auto</span></span><br><span class="line">SW3(config-router)<span class="comment">#network 0.0.0.0</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">R1:</span><br><span class="line">R1(config)<span class="comment">#router rip</span></span><br><span class="line">R1(config-router)<span class="comment">#version 2</span></span><br><span class="line">R1(config-router)<span class="comment">#no auto</span></span><br><span class="line">R1(config-router)<span class="comment">#network 192.168.5.0</span></span><br><span class="line">R1(config-router)<span class="comment">#network 192.168.6.0</span></span><br><span class="line">R1(config-router)<span class="comment">#do clear ip rou *</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815154527.png" alt=""></p>
+<p>步骤六：给对应VLAN的PC配置IP和网关。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PC5:</span><br><span class="line">PC5&gt; ip 192.168.1.100 192.168.1.254</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.1.100 255.255.255.0 gateway 192.168.1.254</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PC6:</span><br><span class="line">PC6&gt; ip 192.168.2.100 192.168.2.254</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.2.100 255.255.255.0 gateway 192.168.2.254</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PC7:</span><br><span class="line">PC7&gt; ip 192.168.3.100 192.168.3.254</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.3.100 255.255.255.0 gateway 192.168.3.254</span><br></pre></td></tr></table></figure>
+
+<p>步骤七：Ping测试。</p>
+<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815160848.png" alt=""></p>
+<h2 id="实验总结："><a href="#实验总结：" class="headerlink" title="实验总结："></a>实验总结：</h2><p>VRRP是一种容错协议，路由器出现故障时，由另一台路由器来代替出现故障的路由器进行工作，从而保持网络通信的连续性和可靠性。</p>
+<p>VRRP具有如下优点：</p>
+<ul>
+<li>简化网络管理。在具有多播或广播能力的局域网（如以太网）中，借助VRRP能在某台设备出现故障时仍然提供高可靠的缺省链路，有效避免单一链路发生故障后网络中断的问题，而无需修改动态路由协议、路由发现协议等配置信息，也无需修改主机的默认网关配置。</li>
+<li>适应性强。VRRP报文封装在IP报文中，支持各种上层协议。</li>
+<li>网络开销小。VRRP只定义了一种报文——VRRP通告报文，并且只有处于Master状态的路由器可以发送VRRP报文。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>如果喜欢这篇文章，可以随意捐赠哦。<dvi style="color:#f72b07" ><dvi style="color:#f72b07" ><br>（救救吃土的博主吧o(╥﹏╥)o）</br></dvi></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="Tangxiaoyan 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Tangxiaoyan 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Tangxiaoyan
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/" title="Vrrp虚拟路由冗余协议">http://yoursite.com/2020/08/15/Vrrp虚拟路由冗余协议/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Trunk/" rel="tag"># Trunk</a>
+              <a href="/tags/Vrrp%E5%8D%8F%E8%AE%AE/" rel="tag"># Vrrp协议</a>
+              <a href="/tags/Rip/" rel="tag"># Rip</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/12/Postix%E9%82%AE%E4%BB%B6%E6%9C%8D%E5%8A%A1/" rel="prev" title="Postix邮件服务">
+      <i class="fa fa-chevron-left"></i> Postix邮件服务
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实验名称：VRRT虚拟路由冗余协议"><span class="nav-text">实验名称：VRRT虚拟路由冗余协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验拓扑："><span class="nav-text">实验拓扑：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验需求："><span class="nav-text">实验需求：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解题思路："><span class="nav-text">解题思路：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验步骤："><span class="nav-text">实验步骤：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验总结："><span class="nav-text">实验总结：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tangxiaoyan"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tangxiaoyan</p>
+  <div class="site-description" itemprop="description">学海无涯苦作舟</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/tangxiaoyani" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;tangxiaoyani" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:z2940041481@gmail.com" title="E-Mail → mailto:z2940041481@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/6189093975" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;6189093975" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="tencent://AddContact/?fromld=45&fromSubld=|&subcmd=al|&uin=2940041481&website=www.oicqzone.com" title="QQ → tencent:&#x2F;&#x2F;AddContact&#x2F;?fromld&#x3D;45&amp;fromSubld&#x3D;|&amp;subcmd&#x3D;al|&amp;uin&#x3D;2940041481&amp;website&#x3D;www.oicqzone.com" rel="noopener" target="_blank"><i class="fab fa-qq fa-fw"></i>QQ</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://space.bilibili.com/178167831/dynamic" title="BiliBili → https:&#x2F;&#x2F;space.bilibili.com&#x2F;178167831&#x2F;dynamic" rel="noopener" target="_blank"><i class="fa fa-tv fa-fw"></i>BiliBili</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://youtube.com/channel/UCfXMl904KtDnE-7fsvf7jng/" title="YouTube → https:&#x2F;&#x2F;youtube.com&#x2F;channel&#x2F;UCfXMl904KtDnE-7fsvf7jng&#x2F;" rel="noopener" target="_blank"><i class="fab fa-youtube fa-fw"></i>YouTube</a>
+      </span>
+  </div>
+
+
+
+      </div>
+<span id="sitetime"></span>
+<script language=javascript>
+  function siteTime(){
+    window.setTimeout("siteTime()", 1000);
+    var seconds = 1000;
+    var minutes = seconds * 60;
+    var hours = minutes * 60;
+    var days = hours * 24;
+    var years = days * 365;
+    var today = new Date();
+    var todayYear = today.getFullYear();
+    var todayMonth = today.getMonth()+1;
+    var todayDate = today.getDate();
+    var todayHour = today.getHours();
+    var todayMinute = today.getMinutes();
+    var todaySecond = today.getSeconds();
+    /* 
+    Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+    year - 作为date对象的年份，为4位年份值
+    month - 0-11之间的整数，做为date对象的月份
+    day - 1-31之间的整数，做为date对象的天数
+    hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+    minutes - 0-59之间的整数，做为date对象的分钟数
+    seconds - 0-59之间的整数，做为date对象的秒数
+    microseconds - 0-999之间的整数，做为date对象的毫秒数
+        */
+    var t1 = Date.UTC(2020,06,25,15,00,00); //北京时间2018-2-13 00:00:00
+    var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+    var diff = t2-t1;
+    var diffYears = Math.floor(diff/years);
+    var diffDays = Math.floor((diff/days)-diffYears*365);
+    var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+    var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+    var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+    document.getElementById("sitetime").innerHTML=" 已运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟";
+  }
+  siteTime();
+</script>
+<dvi style="color:#f72b07" ><br>企鹅:2940041481</br>感谢有你~</dvi>
+    </div>
+    
+    <!--网易云插件-->
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=477913&auto=0&height=66"></iframe>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<img src="https://static.dy208.cn/o_1dfilp8ruo521thr1hvf18ji17soa.png">
+<a href="http://www.beian.miit.gov.cn/"  style="color:#f72b07" target="_blank">鄂ICP备 - 20011064号</a>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tangxiaoyan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'EVciaYcCHq7e2urqCkBtDA3I-gzGzoHsz',
+      appKey     : '8FF0lo5eQSKrUP6iy9VTKadz',
+      placeholder: "来呀造作呀Ｏ(≧▽≦)Ｏ，建议留言时留下邮箱哦 (っ•̀ω•́)っ✎⁾⁾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
