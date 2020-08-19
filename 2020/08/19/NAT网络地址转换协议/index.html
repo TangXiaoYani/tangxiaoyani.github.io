@@ -20,30 +20,45 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"b2t":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="学海无涯苦作舟">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Tangxiaoyan&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="实验名称：静态NAT转换实验拓扑 实验要求将内网地址192.168.100.2、192.168.100.3静态转换为合法的外部地址61.159.62.131、61.159.62.132，以便访问外网或被外网访问 实验思路1.配置基础网络 2.配置交换机vlan，并打开三层路由 3.配置静态NAT实现全网互通 实验步骤1234567891011121314151617SW1:SW1(config)#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NAT网络地址转换协议">
+<meta property="og:url" content="http://yoursite.com/2020/08/19/NAT%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E5%8D%8F%E8%AE%AE/index.html">
 <meta property="og:site_name" content="Tangxiaoyan&#39;s Blog">
-<meta property="og:description" content="学海无涯苦作舟">
+<meta property="og:description" content="实验名称：静态NAT转换实验拓扑 实验要求将内网地址192.168.100.2、192.168.100.3静态转换为合法的外部地址61.159.62.131、61.159.62.132，以便访问外网或被外网访问 实验思路1.配置基础网络 2.配置交换机vlan，并打开三层路由 3.配置静态NAT实现全网互通 实验步骤1234567891011121314151617SW1:SW1(config)#">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818145153.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818193208.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818194258.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818194315.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818195449.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818201226.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818201245.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818204838.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818205714.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818210238.png">
+<meta property="og:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818210319.png">
+<meta property="article:published_time" content="2020-08-19T07:21:10.000Z">
+<meta property="article:modified_time" content="2020-08-19T07:22:19.728Z">
 <meta property="article:author" content="Tangxiaoyan">
+<meta property="article:tag" content="NAT">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818145153.png">
 
-<link rel="canonical" href="http://yoursite.com/">
+<link rel="canonical" href="http://yoursite.com/2020/08/19/NAT%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E5%8D%8F%E8%AE%AE/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>Tangxiaoyan's Blog</title>
+  <title>NAT网络地址转换协议 | Tangxiaoyan's Blog</title>
   
 
 
@@ -186,106 +201,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/" class="post-title-link" itemprop="url">我的世界Linux开服环境搭建</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-06-28 16:15:09" itemprop="dateCreated datePublished" datetime="2020-06-28T16:15:09+08:00">2020-06-28</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-30 11:48:12" itemprop="dateModified" datetime="2020-07-30T11:48:12+08:00">2020-07-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
 
     
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200711132031.png" alt=""></p>
-<p>现在个人服务器价格以及基本进入大众可消费的水平，不是只有需要架设网站的用户才有服务器需求。我们也也可以来做很多事情，比如说搭建一个Minecraft的服务器，让我们可以很方便的与小伙伴联机，这篇主要就来通过Linux以及MCSM面板教大家搭建一个Minecraft服务器。</p>
-<p><font color=#FF0000 >喜欢或者有问题的同学，可以在下发评论留言哦！</font>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/06/28/%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8CMCSM%E9%9D%A2%E6%9D%BF%E6%90%AD%E5%BB%BA/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -301,10 +220,9 @@
       <meta itemprop="name" content="Tangxiaoyan's Blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/19/NAT%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E5%8D%8F%E8%AE%AE/" class="post-title-link" itemprop="url">NAT网络地址转换协议</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          NAT网络地址转换协议
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -327,6 +245,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
   
   <span class="post-meta-item">
     
@@ -351,7 +276,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="实验名称：静态NAT转换"><a href="#实验名称：静态NAT转换" class="headerlink" title="实验名称：静态NAT转换"></a>实验名称：静态NAT转换</h1><h2 id="实验拓扑"><a href="#实验拓扑" class="headerlink" title="实验拓扑"></a>实验拓扑</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818145153.png" alt=""></p>
+        <h1 id="实验名称：静态NAT转换"><a href="#实验名称：静态NAT转换" class="headerlink" title="实验名称：静态NAT转换"></a>实验名称：静态NAT转换</h1><h2 id="实验拓扑"><a href="#实验拓扑" class="headerlink" title="实验拓扑"></a>实验拓扑</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818145153.png" alt=""></p>
 <h2 id="实验要求"><a href="#实验要求" class="headerlink" title="实验要求"></a>实验要求</h2><p>将内网地址192.168.100.2、192.168.100.3静态转换为合法的外部地址61.159.62.131、61.159.62.132，以便访问外网或被外网访问</p>
 <h2 id="实验思路"><a href="#实验思路" class="headerlink" title="实验思路"></a>实验思路</h2><p>1.配置基础网络</p>
 <p>2.配置交换机vlan，并打开三层路由</p>
@@ -451,807 +376,77 @@
 <h2 id="实验结论-1"><a href="#实验结论-1" class="headerlink" title="实验结论"></a>实验结论</h2><p>端口多路复用：内部网络的所有主机均可共享一个合法外部IP地址实现对Internet的访问，从而可以最大限度地节约IP地址资源，同时，又可隐藏网络内部的所有主机，有效避免来自internet的攻击。因此，目前网络中应用最多的就是端口多路复用方式。</p>
 <p>1.动静态NAT无法解决ip地址匮乏问题 (默认一个私网IP地址对一个公网IP地址)<br>2.PAT却可以解决ip地址匮乏(多个私网IP地址对一个公网IP地址)</p>
 
-      
     </div>
 
     
     
     
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
+        <div class="reward-container">
+  <div>如果喜欢这篇文章，可以随意捐赠哦。<dvi style="color:#f72b07" ><dvi style="color:#f72b07" ><br>（救救吃土的博主吧o(╥﹏╥)o）</br></dvi></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
       
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/17/Acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%88%97%E8%A1%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/17/Acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%88%97%E8%A1%A8/" class="post-title-link" itemprop="url">Acl访问控制列表</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-17 23:02:12 / 修改时间：23:03:45" itemprop="dateCreated datePublished" datetime="2020-08-17T23:02:12+08:00">2020-08-17</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/08/17/Acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%88%97%E8%A1%A8/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/17/Acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%88%97%E8%A1%A8/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="Tangxiaoyan 微信支付">
+        <p>微信支付</p>
+      </div>
       
-          <h1 id="实验名称：ACL控制列表"><a href="#实验名称：ACL控制列表" class="headerlink" title="实验名称：ACL控制列表"></a>实验名称：ACL控制列表</h1><h2 id="实验拓扑："><a href="#实验拓扑：" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200817160922.png" alt=""></p>
-<h2 id="实验要求："><a href="#实验要求：" class="headerlink" title="实验要求："></a>实验要求：</h2><ul>
-<li><p>首先实现全网互通</p>
-</li>
-<li><p>允许PC1访问Web服务器的WWW服务</p>
-</li>
-<li><p>禁止PC1访问Web服务器的其它服务</p>
-</li>
-<li><p>允许主机PC1访问网络192.168.2.0/24</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/17/Acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%88%97%E8%A1%A8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Tangxiaoyan 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
         
-      
-    </div>
 
-    
-    
-    
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Tangxiaoyan
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2020/08/19/NAT%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E5%8D%8F%E8%AE%AE/" title="NAT网络地址转换协议">http://yoursite.com/2020/08/19/NAT网络地址转换协议/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/NAT/" rel="tag"># NAT</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/15/PPP%E9%93%BE%E8%B7%AF%E8%AE%A4%E8%AF%81/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/15/PPP%E9%93%BE%E8%B7%AF%E8%AE%A4%E8%AF%81/" class="post-title-link" itemprop="url">PPP链路认证</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-08-15 23:47:53" itemprop="dateCreated datePublished" datetime="2020-08-15T23:47:53+08:00">2020-08-15</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-17 09:41:18" itemprop="dateModified" datetime="2020-08-17T09:41:18+08:00">2020-08-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/08/15/PPP%E9%93%BE%E8%B7%AF%E8%AE%A4%E8%AF%81/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/15/PPP%E9%93%BE%E8%B7%AF%E8%AE%A4%E8%AF%81/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="实验名称：PPP链路认证"><a href="#实验名称：PPP链路认证" class="headerlink" title="实验名称：PPP链路认证"></a>实验名称：PPP链路认证</h1><h2 id="实验拓扑"><a href="#实验拓扑" class="headerlink" title="实验拓扑"></a>实验拓扑</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815234509.png" alt=""></p>
-<h2 id="实验要求"><a href="#实验要求" class="headerlink" title="实验要求"></a>实验要求</h2><p>1.路由器A和B通过专线相连，路由器A和B相连网络的掩码为/30网段，两台路由器能通信</p>
-<p>2.在路由器A与B上实现PAP认证，使两台路由器能互通；</p>
-<p>3.在路由器A与B上实现CHAP认证，使两台路由器能互通；</p>
-<p>注意：认证者为R2，被认证者为R1；</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/15/PPP%E9%93%BE%E8%B7%AF%E8%AE%A4%E8%AF%81/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/" class="post-title-link" itemprop="url">Vrrp虚拟路由冗余协议</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-15 20:05:50 / 修改时间：21:22:32" itemprop="dateCreated datePublished" datetime="2020-08-15T20:05:50+08:00">2020-08-15</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="实验名称：VRRT虚拟路由冗余协议"><a href="#实验名称：VRRT虚拟路由冗余协议" class="headerlink" title="实验名称：VRRT虚拟路由冗余协议"></a>实验名称：VRRT虚拟路由冗余协议</h2><h2 id="实验拓扑："><a href="#实验拓扑：" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200815193012.png" alt=""></p>
-<h2 id="实验需求："><a href="#实验需求：" class="headerlink" title="实验需求："></a>实验需求：</h2><p>1、共有6个VLAN，为VLAN1-6，都运行MSTP协议，要求让SW2作为VLAN1-3的根网桥，同时作为VLAN4-6的备份根网桥；让SW3作为VLAN4-6的根网桥，同时作为VLAN1-3的备份根网桥</p>
-<p>2、将SW2与SW3相连的链路捆梆成以太通道，并允许所有VLAN的流量通过</p>
-<p>3、通过VRRP实现网关的可靠性，并跟踪端口，保证当链路出现故障时可切换链路，以恢复网络通畅</p>
-<p>4、为了适应网络的灵活变化，内网通过RIPv2运态路由进行互联</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/15/Vrrp%E8%99%9A%E6%8B%9F%E8%B7%AF%E7%94%B1%E5%86%97%E4%BD%99%E5%8D%8F%E8%AE%AE/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/17/Acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%88%97%E8%A1%A8/" rel="prev" title="Acl访问控制列表">
+      <i class="fa fa-chevron-left"></i> Acl访问控制列表
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
   
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/12/Postix%E9%82%AE%E4%BB%B6%E6%9C%8D%E5%8A%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/12/Postix%E9%82%AE%E4%BB%B6%E6%9C%8D%E5%8A%A1/" class="post-title-link" itemprop="url">Postix邮件服务</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-12 17:40:39 / 修改时间：17:58:06" itemprop="dateCreated datePublished" datetime="2020-08-12T17:40:39+08:00">2020-08-12</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/08/12/Postix%E9%82%AE%E4%BB%B6%E6%9C%8D%E5%8A%A1/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/12/Postix%E9%82%AE%E4%BB%B6%E6%9C%8D%E5%8A%A1/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>电子邮件系统基于邮件协议来完成电子邮件的传输，常见的邮件协议有下面这些。</p>
-<p>　　<strong>简单邮件传输协议（Simple Mail Transfer Protocol，SMTP）</strong>：用于发送和中转发出的电子邮件，占用服务器的25/TCP端口。</p>
-<p>　　<strong>邮局协议版本3（Post Office Protocol 3）</strong>：用于将电子邮件存储到本地主机，占用服务器的110/TCP端口。</p>
-<p>　　<strong>Internet消息访问协议版本4（Internet Message Access Protocol 4）</strong>：用于在本地主机上访问邮件，占用服务器的143/TCP端口。</p>
-<p>　　一个最基础的电子邮件系统肯定要能提供发件服务和收件服务，为<strong>此需要使用基于SMTP协议的Postfix服务程序提供发件服务功能，并使用基于POP3协议的Dovecot服务程序提供收件服务功能。</strong>这样一来，用户就可以使用Outlook Express或Foxmail等客户端服务程序正常收发邮件了。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/12/Postix%E9%82%AE%E4%BB%B6%E6%9C%8D%E5%8A%A1/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/12/NFS%E6%9C%8D%E5%8A%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/12/NFS%E6%9C%8D%E5%8A%A1/" class="post-title-link" itemprop="url">NFS服务</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-12 17:40:10 / 修改时间：18:01:59" itemprop="dateCreated datePublished" datetime="2020-08-12T17:40:10+08:00">2020-08-12</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/08/12/NFS%E6%9C%8D%E5%8A%A1/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/12/NFS%E6%9C%8D%E5%8A%A1/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>NFS（Network File System）即网络文件系统，是FreeBSD支持的文件系统中的一种，它允许网络中的计算机之间通过TCP/IP网络共享资源。在NFS的应用中，本地NFS的客户端应用可以透明地读写位于远端NFS服务器上的文件，就像访问本地文件一样。<br>目前NFS主要有两个版本（NFSv2，NFSv3）两个版本，而NFSv2和NFSv3除了3版本支持更多的新特性以外，最主要的区别应该就是NFSv2是使用UDP协议进行传输的，所以NFSv2的连接在复杂网络环境下可能没有那么可靠，而NFSv3同时支持UDP和TCP协议。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/12/NFS%E6%9C%8D%E5%8A%A1/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/07/%E9%98%B6%E6%AE%B5%E6%B5%8B%E8%AF%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/07/%E9%98%B6%E6%AE%B5%E6%B5%8B%E8%AF%95/" class="post-title-link" itemprop="url">阶段测试</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-08-07 18:07:14" itemprop="dateCreated datePublished" datetime="2020-08-07T18:07:14+08:00">2020-08-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-09 13:23:35" itemprop="dateModified" datetime="2020-08-09T13:23:35+08:00">2020-08-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/Windows-Sever2012/" itemprop="url" rel="index"><span itemprop="name">Windows Sever2012</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/08/07/%E9%98%B6%E6%AE%B5%E6%B5%8B%E8%AF%95/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/07/%E9%98%B6%E6%AE%B5%E6%B5%8B%E8%AF%95/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="阶段测试："><a href="#阶段测试：" class="headerlink" title="阶段测试："></a>阶段测试：</h1><h2 id="实验环境"><a href="#实验环境" class="headerlink" title="实验环境:"></a>实验环境:</h2><table>
-<thead>
-<tr>
-<th>Centos 6.5       -A1</th>
-<th>192.168.211.140</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Windows server 2012 r2  -A2</td>
-<td>192.168.211.141</td>
-</tr>
-<tr>
-<td>Windows server 2012 r2  -A3</td>
-<td>192.168.211.142</td>
-</tr>
-</tbody></table>
-<h2 id="实验要求："><a href="#实验要求：" class="headerlink" title="实验要求："></a>实验要求：</h2><ol>
-<li><p>在A1上搭建VSFTPD服务，使用身份认证登录，登录用户为tom，存放文件得路径为/opt/ui</p>
-</li>
-<li><p>在A1上添加虚拟内存，大小为2G。设置开机自启。</p>
-</li>
-<li><p>在A1上创建raid5，磁盘名为r5,能正常挂载使用。</p>
-</li>
-<li><p>在A2上搭建域控，A3加入到域中，域名为2020kl.com,创建用户user1,user2;并且这两个用户能登录到域控制器。设置user1登录时间只能是周一到周三，并且user2不能登录到A3上；</p>
-</li>
-<li><p>用户登录时，不需要输入Ctrl+Alt+Del.</p>
-</li>
-<li><p>在A3上创建ftp，存放文件路径为c:/ftp111，并且，使用用户认证登录，只能登录到自己得家目录中，并且在各自文件夹中上传以自己名字命名得一个文件。用户名为user1,user2</p>
-</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/07/%E9%98%B6%E6%AE%B5%E6%B5%8B%E8%AF%95/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/06/%E5%A4%9A%E5%8C%BA%E5%9F%9F%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE-MSTP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/06/%E5%A4%9A%E5%8C%BA%E5%9F%9F%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE-MSTP/" class="post-title-link" itemprop="url">多区域生成树协议-MSTP</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-06 23:03:07 / 修改时间：23:04:06" itemprop="dateCreated datePublished" datetime="2020-08-06T23:03:07+08:00">2020-08-06</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/08/06/%E5%A4%9A%E5%8C%BA%E5%9F%9F%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE-MSTP/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/06/%E5%A4%9A%E5%8C%BA%E5%9F%9F%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE-MSTP/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="实验名称：STP生成树实验"><a href="#实验名称：STP生成树实验" class="headerlink" title="实验名称：STP生成树实验"></a>实验名称：STP生成树实验</h2><h2 id="实验拓扑："><a href="#实验拓扑：" class="headerlink" title="实验拓扑："></a>实验拓扑：</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200806222810.png" alt=""></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/06/%E5%A4%9A%E5%8C%BA%E5%9F%9F%E7%94%9F%E6%88%90%E6%A0%91%E5%8D%8F%E8%AE%AE-MSTP/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/06/Centos6-5%E4%B8%AD%E7%9A%84%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tangxiaoyan">
-      <meta itemprop="description" content="学海无涯苦作舟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tangxiaoyan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/08/06/Centos6-5%E4%B8%AD%E7%9A%84%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/" class="post-title-link" itemprop="url">Centos6.5中的磁盘管理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-08-06 17:49:34 / 修改时间：17:53:51" itemprop="dateCreated datePublished" datetime="2020-08-06T17:49:34+08:00">2020-08-06</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/08/06/Centos6-5%E4%B8%AD%E7%9A%84%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/06/Centos6-5%E4%B8%AD%E7%9A%84%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Centos6-5中的磁盘管理"><a href="#Centos6-5中的磁盘管理" class="headerlink" title="Centos6.5中的磁盘管理"></a>Centos6.5中的磁盘管理</h1>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/08/06/Centos6-5%E4%B8%AD%E7%9A%84%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
 
 
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -1298,6 +493,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实验名称：静态NAT转换"><span class="nav-text">实验名称：静态NAT转换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实验拓扑"><span class="nav-text">实验拓扑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验要求"><span class="nav-text">实验要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验思路"><span class="nav-text">实验思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验步骤"><span class="nav-text">实验步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验总结"><span class="nav-text">实验总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实验名称：动态NAT转换"><span class="nav-text">实验名称：动态NAT转换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实验拓扑-1"><span class="nav-text">实验拓扑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验要求-1"><span class="nav-text">实验要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验思路-1"><span class="nav-text">实验思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验步骤-1"><span class="nav-text">实验步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验结论"><span class="nav-text">实验结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验名称：端口多路复用OverLoad配置实验"><span class="nav-text">实验名称：端口多路复用OverLoad配置实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验拓扑-2"><span class="nav-text">实验拓扑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验要求-2"><span class="nav-text">实验要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验思路-2"><span class="nav-text">实验思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验步骤-2"><span class="nav-text">实验步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验结论-1"><span class="nav-text">实验结论</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
