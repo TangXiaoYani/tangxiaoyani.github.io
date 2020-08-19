@@ -314,7 +314,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-08-19 15:21:10 / 修改时间：15:22:19" itemprop="dateCreated datePublished" datetime="2020-08-19T15:21:10+08:00">2020-08-19</time>
+              <time title="创建时间：2020-08-19 15:21:10 / 修改时间：15:25:08" itemprop="dateCreated datePublished" datetime="2020-08-19T15:21:10+08:00">2020-08-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -353,104 +353,14 @@
       
           <h1 id="实验名称：静态NAT转换"><a href="#实验名称：静态NAT转换" class="headerlink" title="实验名称：静态NAT转换"></a>实验名称：静态NAT转换</h1><h2 id="实验拓扑"><a href="#实验拓扑" class="headerlink" title="实验拓扑"></a>实验拓扑</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818145153.png" alt=""></p>
 <h2 id="实验要求"><a href="#实验要求" class="headerlink" title="实验要求"></a>实验要求</h2><p>将内网地址192.168.100.2、192.168.100.3静态转换为合法的外部地址61.159.62.131、61.159.62.132，以便访问外网或被外网访问</p>
-<h2 id="实验思路"><a href="#实验思路" class="headerlink" title="实验思路"></a>实验思路</h2><p>1.配置基础网络</p>
-<p>2.配置交换机vlan，并打开三层路由</p>
-<p>3.配置静态NAT实现全网互通</p>
-<h2 id="实验步骤"><a href="#实验步骤" class="headerlink" title="实验步骤"></a>实验步骤</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">SW1:</span><br><span class="line">SW1(config)<span class="comment">#vlan 1   </span></span><br><span class="line">SW1(config-vlan)<span class="comment">#exit</span></span><br><span class="line">SW1(config)<span class="comment">#int vlan 1</span></span><br><span class="line">SW1(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 18 11:11:50.503: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to down</span><br><span class="line">SW1(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">SW1(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 18 11:11:55.607: %LINK-3-UPDOWN: Interface Vlan1, changed state to up</span><br><span class="line">*Aug 18 11:11:56.615: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to up</span><br><span class="line">SW1(config-if)<span class="comment">#ip add 192.168.100.254 255.255.255.0</span></span><br><span class="line">SW1(config-if)<span class="comment">#int range e0/0-2</span></span><br><span class="line">SW1(config-if-range)<span class="comment">#switchport mode access </span></span><br><span class="line">SW1(config-if-range)<span class="comment">#switchport access vlan 1</span></span><br><span class="line">SW1(config-if-range)<span class="comment">#exit</span></span><br><span class="line">SW1(config)<span class="comment">#ip routing</span></span><br><span class="line">SW1(config)<span class="comment">#no ip cef</span></span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">R1:</span><br><span class="line">R1(config)<span class="comment">#int e0/0</span></span><br><span class="line">R1(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">R1(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 18 07:01:41.119: %LINK-3-UPDOWN: Interface Ethernet0/0, changed state to up</span><br><span class="line">*Aug 18 07:01:42.125: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br><span class="line">R1(config-if)<span class="comment">#ip add 192.168.100.1 255.255.255.0</span></span><br><span class="line">R1(config-if)<span class="comment">#int e0/1 </span></span><br><span class="line">R1(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">R1(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 18 07:02:02.172: %LINK-3-UPDOWN: Interface Ethernet0/1, changed state to up</span><br><span class="line">*Aug 18 07:02:03.174: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/1, changed state to up</span><br><span class="line">R1(config-if)<span class="comment">#ip add 61.159.62.130 255.255.255.0</span></span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">R2:</span><br><span class="line">R2(config)<span class="comment">#int e0/0</span></span><br><span class="line">R2(config-if)<span class="comment">#ip add 61.159.62.254 255.255.255.0</span></span><br><span class="line">R2(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">R2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 18 11:19:02.972: %LINK-3-UPDOWN: Interface Ethernet0/0, changed state to up</span><br><span class="line">R2(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 18 11:19:03.980: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PC2:</span><br><span class="line">PC2&gt; ip 192.168.100.2 192.168.100.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.100.2 255.255.255.0 gateway 192.168.100.1</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PC3:</span><br><span class="line">PC3&gt; ip 192.168.100.3 192.168.100.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.100.3 255.255.255.0 gateway 192.168.100.1</span><br></pre></td></tr></table></figure>
-
-<p>进行Ping测试，发现Ping的通R1的e0/1却Ping不通同一网段的R2的e0/0</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818193208.png" alt=""></p>
-<p>R2根据题目要求配置NAT</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">R1(config)<span class="comment">#ip nat inside source static 192.168.100.2 61.159.62.130</span></span><br><span class="line">R1(config)<span class="comment">#ip na</span></span><br><span class="line">*Aug 18 11:44:39.205: %LINEPROTO-5-UPDOWN: Line protocol on Interface NVI0, changed state to up</span><br><span class="line">R1(config)<span class="comment">#ip nat inside sour  </span></span><br><span class="line">R1(config)<span class="comment">#ip nat inside source static 192.168.100.3 61.159.62.131</span></span><br><span class="line">R1(config)<span class="comment">#int e0/0</span></span><br><span class="line">R1(config-if)<span class="comment">#ip nat inside    </span></span><br><span class="line">R1(config-if)<span class="comment">#int e0/1</span></span><br><span class="line">R1(config-if)<span class="comment">#ip nat outside</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818194258.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818194315.png" alt=""></p>
-<p>发现已经可以Ping通。</p>
-<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>静态NAT：一个私有IP固定映射一个公有IP地址，提供内网服务器的对外访问服务。</p>
-<p><strong>NAT的优点：</strong></p>
-<ul>
-<li>节省公有合法IP地址</li>
-<li>处理地址重叠</li>
-<li>增强灵活性</li>
-<li>安全性</li>
-</ul>
-<p><strong>NAT的缺点</strong></p>
-<ul>
-<li>延迟增大</li>
-<li>配置和维护的复杂性</li>
-<li>不支持某些应用，可以通过静态NAT映射来避免</li>
-</ul>
-<h1 id="实验名称：动态NAT转换"><a href="#实验名称：动态NAT转换" class="headerlink" title="实验名称：动态NAT转换"></a>实验名称：动态NAT转换</h1><h2 id="实验拓扑-1"><a href="#实验拓扑-1" class="headerlink" title="实验拓扑"></a>实验拓扑</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818195449.png" alt=""></p>
-<h2 id="实验要求-1"><a href="#实验要求-1" class="headerlink" title="实验要求"></a>实验要求</h2><p>将内部地址192.168.100.2～192.168.100.254转换为合法地址61.159.62.131～61.159.62.190</p>
-<h2 id="实验思路-1"><a href="#实验思路-1" class="headerlink" title="实验思路"></a>实验思路</h2><p>1.根据静态NAT的配置初始适当修改，修改为拓扑图基础环境</p>
-<p>2.配置Acl规则指定可以通过的网段</p>
-<p>3.配置动态NAT</p>
-<p>4.应用配置好的NAT到指定接口</p>
-<p>5.测试</p>
-<h2 id="实验步骤-1"><a href="#实验步骤-1" class="headerlink" title="实验步骤"></a>实验步骤</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">SW1(config)<span class="comment"># int vlan 1  </span></span><br><span class="line">SW1(config-if)<span class="comment">#ip add 192.168.100.100 255.255.255.0</span></span><br><span class="line">SW1(config)<span class="comment">#do show ip int br</span></span><br><span class="line">Interface              IP-Address      OK? Method Status                Protocol</span><br><span class="line">Ethernet0/0            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Ethernet0/1            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Ethernet0/2            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Ethernet0/3            unassigned      YES <span class="built_in">unset</span>  up                    up      </span><br><span class="line">Vlan1                  192.168.100.100 YES manual up                    up</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">R1:</span><br><span class="line">R1(config)<span class="comment">#int e0/0</span></span><br><span class="line">R1(config-if)<span class="comment">#no ip nat inside           </span></span><br><span class="line">R1(config-if)<span class="comment">#int e0/1</span></span><br><span class="line">R1(config-if)<span class="comment">#no ip nat outside</span></span><br><span class="line">R1(config-if)<span class="comment">#no ip nat inside source static 192.168.100.3 61.159.62.131</span></span><br><span class="line">R1(config)<span class="comment">#no ip nat inside source static 192.168.100.2 61.159.62.130</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PC3:</span><br><span class="line">PC3&gt; ip 192.168.100.254 192.168.100.1</span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 192.168.100.254 255.255.255.0 gateway 192.168.100.1</span><br></pre></td></tr></table></figure>
-
-<p>配置Acl规则指定可以通过的网段</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">R1(config)<span class="comment">#access-list 1 permit 192.168.100.0 0.0.0.255</span></span><br></pre></td></tr></table></figure>
-
-<p>配置动态NAT</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">R1(config)<span class="comment">#ip nat pool 123 61.159.62.131 61.159.62.190 netmask 255.255.255.0</span></span><br></pre></td></tr></table></figure>
-
-<p>把Acl和NAT绑定在一起</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">R1(config)<span class="comment">#ip nat inside source list 1 pool 123</span></span><br></pre></td></tr></table></figure>
-
-<p>进入接口应用NAT</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">R1(config)<span class="comment">#int e0/0</span></span><br><span class="line">R1(config-if)<span class="comment">#ip nat inside</span></span><br><span class="line">R1(config-if)<span class="comment">#int e0/1</span></span><br><span class="line">R1(config-if)<span class="comment">#ip nat outside</span></span><br></pre></td></tr></table></figure>
-
-<p>测试</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818201226.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818201245.png" alt=""></p>
-<h2 id="实验结论"><a href="#实验结论" class="headerlink" title="实验结论"></a>实验结论</h2><p>动态NAT：私有IP映射地址池中的公有IP，映射关系是动态的，临时的，只要指定哪些内部地址可以进行转换，以及用哪些合法地址作为外部地址时，就可以进行动态转换。动态转换可以使用多个合法外部地址集。当ISP提供的合法IP地址略少于网络内部的计算机数量时。可以采用动态转换的方式。</p>
-<h2 id="实验名称：端口多路复用OverLoad配置实验"><a href="#实验名称：端口多路复用OverLoad配置实验" class="headerlink" title="实验名称：端口多路复用OverLoad配置实验"></a>实验名称：端口多路复用OverLoad配置实验</h2><h2 id="实验拓扑-2"><a href="#实验拓扑-2" class="headerlink" title="实验拓扑"></a>实验拓扑</h2><p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818204838.png" alt=""></p>
-<h2 id="实验要求-2"><a href="#实验要求-2" class="headerlink" title="实验要求"></a>实验要求</h2><p>将内部网络地址10.1.1.1～10.1.1.254转换为合法的地址61.159.62.131/29，以便访问R2</p>
-<h2 id="实验思路-2"><a href="#实验思路-2" class="headerlink" title="实验思路"></a>实验思路</h2><p>1.搭建基本实验环境(使用上次实验配置，并进行适当修改)</p>
-<p>2.配置Acl列表</p>
-<p>3.配置NAT</p>
-<p>4.把Acl和NAT绑定在一起</p>
-<p>5.应用NAT规则在合适的接口</p>
-<h2 id="实验步骤-2"><a href="#实验步骤-2" class="headerlink" title="实验步骤"></a>实验步骤</h2><p>搭建基础实验环境</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">R1:(被清空配合，需要重新配置)</span><br><span class="line">R1(config)<span class="comment">#int e0/1</span></span><br><span class="line">R1(config-if)<span class="comment">#ip add 61.159.62.130 255.255.255.0</span></span><br><span class="line">R1(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">R1(config-if)<span class="comment">#int e0/0</span></span><br><span class="line">R1(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 18 12:59:52.569: %LINK-3-UPDOWN: Interface Ethernet0/1, changed state to up</span><br><span class="line">*Aug 18 12:59:53.576: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/1, changed state to up</span><br><span class="line">R1(config-if)<span class="comment">#ip add 10.1.1.1 255.255.255.0</span></span><br><span class="line">R1(config-if)<span class="comment">#no shutdown</span></span><br><span class="line">R1(config-if)<span class="comment">#</span></span><br><span class="line">*Aug 18 13:00:05.093: %LINK-3-UPDOWN: Interface Ethernet0/0, changed state to up</span><br><span class="line">*Aug 18 13:00:06.102: %LINEPROTO-5-UPDOWN: Line protocol on Interface Ethernet0/0, changed state to up</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SW1:</span><br><span class="line">SW1(config)<span class="comment">#int vlan 1</span></span><br><span class="line">SW1(config-if)<span class="comment">#ip add 10.1.1.100 255.255.255.0</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PC2:</span><br><span class="line">PC2&gt; ip 10.1.1.2 10.1.1.1 </span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 10.1.1.2 255.255.255.0 gateway 10.1.1.1</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PC3:</span><br><span class="line">PC3&gt; ip 10.1.1.3 10.1.1.1            </span><br><span class="line">Checking <span class="keyword">for</span> duplicate address...</span><br><span class="line">PC1 : 10.1.1.3 255.255.255.0 gateway 10.1.1.</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818205714.png" alt=""></p>
-<p>配置NAT</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">R1:</span><br><span class="line">R1(config)<span class="comment">#access-list 1 permit 10.1.1.0 0.0.0.255 </span></span><br><span class="line">R1(config)<span class="comment">#ip nat pool 321 61.159.62.131 61.159.62.131 netmask 255.255.255.0</span></span><br><span class="line">R1(config)<span class="comment">#</span></span><br><span class="line">*Aug 18 13:06:57.144: %LINEPROTO-5-UPDOWN: Line protocol on Interface NVI0, changed state to up</span><br><span class="line">R1(config)<span class="comment">#ip nat inside source list 1 pool 321 overload </span></span><br><span class="line">R1(config)<span class="comment">#int e0/0</span></span><br><span class="line">R1(config-if)<span class="comment">#ip nat in</span></span><br><span class="line">R1(config-if)<span class="comment">#int e0/1</span></span><br><span class="line">R1(config-if)<span class="comment">#ip nat out</span></span><br></pre></td></tr></table></figure>
-
-<p>测试：</p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818210238.png" alt=""></p>
-<p><img src="https://tangxiaoyan.oss-cn-hangzhou.aliyuncs.com/tuchuang/20200818210319.png" alt=""></p>
-<h2 id="实验结论-1"><a href="#实验结论-1" class="headerlink" title="实验结论"></a>实验结论</h2><p>端口多路复用：内部网络的所有主机均可共享一个合法外部IP地址实现对Internet的访问，从而可以最大限度地节约IP地址资源，同时，又可隐藏网络内部的所有主机，有效避免来自internet的攻击。因此，目前网络中应用最多的就是端口多路复用方式。</p>
-<p>1.动静态NAT无法解决ip地址匮乏问题 (默认一个私网IP地址对一个公网IP地址)<br>2.PAT却可以解决ip地址匮乏(多个私网IP地址对一个公网IP地址)</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/08/19/NAT%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E5%8D%8F%E8%AE%AE/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
